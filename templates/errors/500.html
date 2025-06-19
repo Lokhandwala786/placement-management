@@ -1,0 +1,28 @@
+{% extends 'index.html' %}
+
+{% block title %}Server Error - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div>
+                <i class="fas fa-server text-danger" style="font-size: 5rem;"></i>
+                <h1 class="display-1 fw-bold text-primary mt-3">500</h1>
+                <h2 class="mb-3">Server Error</h2>
+                <p class="lead text-muted mb-4">
+                    Something went wrong on our end. We're working to fix this issue.
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'core:home' %}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Go Home
+                    </a>
+                    <button onclick="location.reload()" class="btn btn-outline-primary">
+                        <i class="fas fa-redo me-2"></i>Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
