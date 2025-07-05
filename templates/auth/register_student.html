@@ -1,0 +1,158 @@
+{% extends 'index.html' %}
+
+{% block title %}Student Registration - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-custom">
+                <div class="card-header text-center bg-gradient-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>Student Registration
+                    </h4>
+                    <p class="mb-0 mt-2 opacity-75">Create your student account</p>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">
+                                    <i class="fas fa-user me-1"></i>First Name *
+                                </label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required 
+                                       placeholder="First Name">
+                                <div class="invalid-feedback">Please enter your first name.</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Last Name *
+                                </label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required 
+                                       placeholder="Last Name">
+                                <div class="invalid-feedback">Please enter your last name.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="fas fa-at me-1"></i>Username *
+                                </label>
+                                <input type="text" class="form-control" id="username" name="username" required 
+                                       placeholder="Choose a username">
+                                <div class="invalid-feedback">Please choose a username.</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="student_id" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>Student ID *
+                                </label>
+                                <input type="text" class="form-control" id="student_id" name="student_id" required 
+                                       placeholder="Student ID (e.g., CS1234)">
+                                <div class="invalid-feedback">Please enter your student ID.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>Email Address *
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" required 
+                                       placeholder="Email Address">
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>Phone Number *
+                                </label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required 
+                                       placeholder="10-digit phone number">
+                                <div class="invalid-feedback">Please enter your phone number.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="course" class="form-label">
+                                    <i class="fas fa-book me-1"></i>Course *
+                                </label>
+                                <input type="text" class="form-control" id="course" name="course" required 
+                                       placeholder="Course Name">
+                                <div class="invalid-feedback">Please enter your course name.</div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="year" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>Year *
+                                </label>
+                                <select class="form-select" id="year" name="year" required>
+                                    <option value="">Select Year</option>
+                                    <option value="1">First Year</option>
+                                    <option value="2">Second Year</option>
+                                    <option value="3">Third Year</option>
+                                    <option value="4">Fourth Year</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your year.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="cgpa" class="form-label">
+                                <i class="fas fa-chart-line me-1"></i>CGPA (Optional)
+                            </label>
+                            <input type="number" class="form-control" id="cgpa" name="cgpa" 
+                                   placeholder="CGPA (0.00 - 10.00)" step="0.01" min="0" max="10">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="password1" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Password *
+                                </label>
+                                <input type="password" class="form-control" id="password1" name="password1" required 
+                                       placeholder="Password (min 8 characters)">
+                                <div class="invalid-feedback">Please enter a password.</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="password2" class="form-label">
+                                    <i class="fas fa-lock me-1"></i>Confirm Password *
+                                </label>
+                                <input type="password" class="form-control" id="password2" name="password2" required 
+                                       placeholder="Confirm password">
+                                <div class="invalid-feedback">Please confirm your password.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Student Account
+                            </button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <small class="text-muted">
+                                By registering, you agree to our 
+                                <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                <a href="#" class="text-decoration-none">Privacy Policy</a>
+                            </small>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light">
+                    <p class="mb-0">Already have an account?</p>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary mt-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
