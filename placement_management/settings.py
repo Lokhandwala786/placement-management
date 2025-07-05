@@ -12,7 +12,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+<<<<<<< HEAD
 # Application definition - Complete apps for full functionality
+=======
+# Application definition - Minimal apps for frontend only
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -22,11 +26,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'core',  # Core app for utilities and views
+<<<<<<< HEAD
     'accounts',  # User authentication and profiles
     'placements',  # Placement management
     'students',  # Student-specific functionality
     'tutors',  # Tutor-specific functionality
     'providers',  # Provider-specific functionality
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 ]
 
 MIDDLEWARE = [
@@ -37,7 +44,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+<<<<<<< HEAD
     'core.middleware.UserTypeMiddleware',  # Custom middleware for user type handling
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 ]
 
 ROOT_URLCONF = 'placement_management.urls'
@@ -61,7 +71,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'placement_management.wsgi.application'
 
+<<<<<<< HEAD
 # Database - Using SQLite for development (will be changed to MySQL later)
+=======
+# Database - Using SQLite for sessions only
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -69,9 +83,12 @@ DATABASES = {
     }
 }
 
+<<<<<<< HEAD
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/London'
@@ -105,6 +122,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+<<<<<<< HEAD
 # Login/Logout URLs
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -128,3 +146,8 @@ os.makedirs(BASE_DIR / 'media', exist_ok=True)
 os.makedirs(BASE_DIR / 'media/resumes', exist_ok=True)
 os.makedirs(BASE_DIR / 'media/placement_documents', exist_ok=True)
 os.makedirs(BASE_DIR / 'media/placement_reports', exist_ok=True)
+=======
+# Create required directories
+os.makedirs(BASE_DIR / 'static', exist_ok=True)
+os.makedirs(BASE_DIR / 'media', exist_ok=True)
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88

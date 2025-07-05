@@ -295,19 +295,31 @@
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
+<<<<<<< HEAD
                                 <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+=======
+                                <li><a class="dropdown-item" href="{% url 'core:logout' %}">
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
                                     <i class="fas fa-sign-out-alt me-2"></i>Logout
                                 </a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
+<<<<<<< HEAD
                             <a class="nav-link" href="{% url 'accounts:login' %}">
+=======
+                            <a class="nav-link" href="{% url 'core:login' %}">
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
                                 <i class="fas fa-sign-in-alt me-1"></i>Login
                             </a>
                         </li>
                         <li class="nav-item">
+<<<<<<< HEAD
                             <a class="nav-link" href="{% url 'accounts:register_choice' %}">
+=======
+                            <a class="nav-link" href="{% url 'core:register_choice' %}">
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
                                 <i class="fas fa-user-plus me-1"></i>Register
                             </a>
                         </li>
@@ -346,6 +358,7 @@
                         </p>
                         <div>
                             {% if not request.session.user_id %}
+<<<<<<< HEAD
                                 <a href="{% url 'accounts:register_choice' %}" class="btn btn-light btn-lg me-3">
                                     <i class="fas fa-rocket me-2"></i>Get Started
                                 </a>
@@ -354,6 +367,16 @@
                                 </a>
                             {% else %}
                                 <a href="{% if request.session.user_type == 'student' %}{% url 'students:dashboard' %}{% elif request.session.user_type == 'tutor' %}{% url 'tutors:dashboard' %}{% elif request.session.user_type == 'provider' %}{% url 'providers:dashboard' %}{% endif %}" class="btn btn-light btn-lg">
+=======
+                                <a href="{% url 'core:register_choice' %}" class="btn btn-light btn-lg me-3">
+                                    <i class="fas fa-rocket me-2"></i>Get Started
+                                </a>
+                                <a href="{% url 'core:login' %}" class="btn btn-outline-light btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                                </a>
+                            {% else %}
+                                <a href="{% if request.session.user_type == 'student' %}{% url 'core:student_dashboard' %}{% elif request.session.user_type == 'tutor' %}{% url 'core:tutor_dashboard' %}{% elif request.session.user_type == 'provider' %}{% url 'core:provider_dashboard' %}{% endif %}" class="btn btn-light btn-lg">
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
                                     <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
                                 </a>
                             {% endif %}
@@ -456,9 +479,15 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="fw-bold mb-3">For Users</h6>
                     <ul class="list-unstyled">
+<<<<<<< HEAD
                         <li><a href="{% url 'accounts:register_student' %}" class="text-muted text-decoration-none">Student Portal</a></li>
                         <li><a href="{% url 'accounts:register_tutor' %}" class="text-muted text-decoration-none">Tutor Portal</a></li>
                         <li><a href="{% url 'accounts:register_provider' %}" class="text-muted text-decoration-none">Provider Portal</a></li>
+=======
+                        <li><a href="{% url 'core:register_student' %}" class="text-muted text-decoration-none">Student Portal</a></li>
+                        <li><a href="{% url 'core:register_tutor' %}" class="text-muted text-decoration-none">Tutor Portal</a></li>
+                        <li><a href="{% url 'core:register_provider' %}" class="text-muted text-decoration-none">Provider Portal</a></li>
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
                     </ul>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">

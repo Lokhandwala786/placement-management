@@ -3,6 +3,7 @@ from .models import PlacementRequest, PlacementReport, Message, VisitSchedule
 
 @admin.register(PlacementRequest)
 class PlacementRequestAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     list_display = ('student', 'company_name', 'job_title', 'status', 'start_date', 'end_date', 'created_at')
     list_filter = ('status', 'start_date', 'end_date', 'created_at')
     search_fields = ('student__user__first_name', 'student__user__last_name', 'company_name', 'job_title')
@@ -35,10 +36,21 @@ class PlacementReportAdmin(admin.ModelAdmin):
     search_fields = ('placement_request__student__user__first_name', 'placement_request__student__user__last_name')
     ordering = ('-submitted_at',)
     readonly_fields = ('submitted_at',)
+=======
+    list_display = ('student', 'company_name', 'job_title', 'status', 'start_date', 'end_date')
+    list_filter = ('status', 'start_date', 'created_at')
+    search_fields = ('company_name', 'job_title', 'student__user__username')
+
+@admin.register(PlacementReport)
+class PlacementReportAdmin(admin.ModelAdmin):
+    list_display = ('placement_request', 'submitted_at')
+    list_filter = ('submitted_at',)
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('sender', 'recipient', 'subject', 'is_read', 'created_at')
+<<<<<<< HEAD
     list_filter = ('is_read', 'created_at', 'sender__user_type', 'recipient__user_type')
     search_fields = ('sender__username', 'recipient__username', 'subject', 'content')
     ordering = ('-created_at',)
@@ -51,3 +63,11 @@ class VisitScheduleAdmin(admin.ModelAdmin):
     search_fields = ('placement_request__company_name', 'tutor__username', 'purpose')
     ordering = ('visit_date',)
     readonly_fields = ('created_at',)
+=======
+    list_filter = ('is_read', 'created_at')
+
+@admin.register(VisitSchedule)
+class VisitScheduleAdmin(admin.ModelAdmin):
+    list_display = ('placement_request', 'tutor', 'visit_date', 'completed')
+    list_filter = ('completed', 'visit_date')
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88

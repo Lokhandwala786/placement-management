@@ -1,10 +1,17 @@
 from django import forms
+<<<<<<< HEAD
 from placements.models import VisitSchedule, PlacementRequest
 from django.utils import timezone
 
 class VisitScheduleForm(forms.ModelForm):
     """Form for scheduling company visits"""
     
+=======
+from placements.models import VisitSchedule
+from django.utils import timezone
+
+class VisitScheduleForm(forms.ModelForm):
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     class Meta:
         model = VisitSchedule
         fields = ['visit_date', 'purpose', 'notes']
@@ -15,17 +22,27 @@ class VisitScheduleForm(forms.ModelForm):
             }),
             'purpose': forms.TextInput(attrs={
                 'class': 'form-control',
+<<<<<<< HEAD
                 'placeholder': 'Purpose of the visit'
             }),
             'notes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'placeholder': 'Additional notes about the visit...',
                 'rows': 3
+=======
+                'placeholder': 'Purpose of visit'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Additional notes...',
+                'rows': 4
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
             }),
         }
 
     def clean_visit_date(self):
         visit_date = self.cleaned_data.get('visit_date')
+<<<<<<< HEAD
         if visit_date:
             if visit_date <= timezone.now():
                 raise forms.ValidationError(
@@ -129,3 +146,8 @@ class ExportForm(forms.Form):
             'type': 'date'
         })
     )
+=======
+        if visit_date and visit_date <= timezone.now():
+            raise forms.ValidationError('Visit date must be in the future.')
+        return visit_date
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88

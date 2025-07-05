@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
+<<<<<<< HEAD
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
@@ -10,35 +11,56 @@ from .forms import VisitScheduleForm, BulkActionForm, PlacementFilterForm, Expor
 import logging
 import csv
 from datetime import datetime, timedelta
+=======
+from core.decorators import tutor_required, handle_exceptions
+from placements.models import PlacementRequest, VisitSchedule
+from .forms import VisitScheduleForm
+import logging
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 
 logger = logging.getLogger(__name__)
 
 @tutor_required
 @handle_exceptions
 def dashboard(request):
+<<<<<<< HEAD
     """Enhanced tutor dashboard with comprehensive statistics"""
     # Get pending requests for approval
+=======
+    """Enhanced tutor dashboard"""
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     pending_requests = PlacementRequest.objects.filter(
         status='approved_by_provider'
     ).order_by('-created_at')
     
+<<<<<<< HEAD
     # Get approved requests by this tutor
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     approved_requests = PlacementRequest.objects.filter(
         approved_by_tutor=request.user
     ).order_by('-created_at')
     
+<<<<<<< HEAD
     # Get upcoming visits
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     upcoming_visits = VisitSchedule.objects.filter(
         tutor=request.user,
         completed=False,
         visit_date__gte=timezone.now()
     ).order_by('visit_date')
     
+<<<<<<< HEAD
     # Comprehensive statistics
+=======
+    # Statistics
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     total_pending = pending_requests.count()
     total_approved = approved_requests.count()
     total_visits = upcoming_visits.count()
     
+<<<<<<< HEAD
     # Monthly statistics
     current_month = timezone.now().month
     monthly_approvals = PlacementRequest.objects.filter(
@@ -46,6 +68,8 @@ def dashboard(request):
         tutor_approved_at__month=current_month
     ).count()
     
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     context = {
         'pending_requests': pending_requests[:5],  # Latest 5
         'approved_requests': approved_requests[:5],  # Latest 5
@@ -54,13 +78,17 @@ def dashboard(request):
             'pending': total_pending,
             'approved': total_approved,
             'visits': total_visits,
+<<<<<<< HEAD
             'monthly_approvals': monthly_approvals,
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
         }
     }
     return render(request, 'tutors/dashboard.html', context)
 
 @tutor_required
 @handle_exceptions
+<<<<<<< HEAD
 def pending_requests(request):
     """ER6: Enhanced pending request management dashboard"""
     # Get all pending requests
@@ -96,11 +124,19 @@ def pending_requests(request):
 @handle_exceptions
 def approve_placement(request, pk):
     """Enhanced placement approval with detailed logging"""
+=======
+def approve_placement(request, pk):
+    """Approve or reject placement request"""
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     placement_request = get_object_or_404(PlacementRequest, pk=pk)
     
     if placement_request.status != 'approved_by_provider':
         messages.error(request, 'This placement request is not ready for tutor approval.')
+<<<<<<< HEAD
         return redirect('tutors:pending_requests')
+=======
+        return redirect('tutors:dashboard')
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -123,7 +159,11 @@ def approve_placement(request, pk):
                 logger.info(f"Placement rejected by tutor {request.user.username}: {pk}")
                 messages.success(request, 'Placement request rejected.')
             
+<<<<<<< HEAD
             return redirect('tutors:pending_requests')
+=======
+            return redirect('tutors:dashboard')
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
             
         except Exception as e:
             logger.error(f"Error in placement approval: {str(e)}")
@@ -136,6 +176,7 @@ def approve_placement(request, pk):
 
 @tutor_required
 @handle_exceptions
+<<<<<<< HEAD
 def bulk_action(request):
     """Bulk action for multiple placement requests"""
     if request.method == 'POST':
@@ -308,13 +349,19 @@ def export_to_pdf(placements, include_reports):
 
 @tutor_required
 @handle_exceptions
+=======
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 def schedule_visit(request, pk):
     """Schedule company visit"""
     placement_request = get_object_or_404(PlacementRequest, pk=pk)
     
     if placement_request.status not in ['approved_by_tutor', 'completed']:
         messages.error(request, 'You can only schedule visits for approved placements.')
+<<<<<<< HEAD
         return redirect('tutors:placement_records')
+=======
+        return redirect('tutors:dashboard')
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
     
     if request.method == 'POST':
         form = VisitScheduleForm(request.POST)
@@ -327,7 +374,11 @@ def schedule_visit(request, pk):
                 
                 logger.info(f"Visit scheduled by {request.user.username} for placement {pk}")
                 messages.success(request, 'Visit scheduled successfully!')
+<<<<<<< HEAD
                 return redirect('tutors:placement_records')
+=======
+                return redirect('tutors:dashboard')
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
                 
             except Exception as e:
                 logger.error(f"Error scheduling visit: {str(e)}")
@@ -358,6 +409,7 @@ def calendar_view(request):
 
 @tutor_required
 @handle_exceptions
+<<<<<<< HEAD
 def placement_detail(request, pk):
     """Detailed view of a specific placement"""
     placement_request = get_object_or_404(PlacementRequest, pk=pk)
@@ -372,3 +424,20 @@ def placement_detail(request, pk):
         'reports': reports,
     }
     return render(request, 'tutors/placement_detail.html', context)
+=======
+def placement_list(request):
+    """List all placements for tutor review"""
+    placements = PlacementRequest.objects.all().order_by('-created_at')
+    
+    # Filter by status if provided
+    status_filter = request.GET.get('status')
+    if status_filter:
+        placements = placements.filter(status=status_filter)
+    
+    context = {
+        'placements': placements,
+        'status_filter': status_filter,
+        'status_choices': PlacementRequest.STATUS_CHOICES,
+    }
+    return render(request, 'tutors/placement_list.html', context)
+>>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
