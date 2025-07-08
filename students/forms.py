@@ -1,6 +1,6 @@
 from django import forms
 from placements.models import PlacementRequest, PlacementReport
-from accounts.models import ProviderProfile
+from accounts.models import ProviderProfile, TutorProfile
 from core.validators import validate_future_date, validate_file_size, validate_file_extension
 
 class PlacementRequestForm(forms.ModelForm):
@@ -9,13 +9,17 @@ class PlacementRequestForm(forms.ModelForm):
     class Meta:
         model = PlacementRequest
         fields = [
-            'provider', 'company_name', 'job_title', 'job_description',
+            'provider', 'tutor', 'company_name', 'job_title', 'job_description',
             'start_date', 'end_date', 'location', 'documents'
         ]
         widgets = {
             'provider': forms.Select(attrs={
                 'class': 'form-select',
                 'placeholder': 'Select placement provider'
+            }),
+            'tutor': forms.Select(attrs={
+                'class': 'form-select',
+                'placeholder': 'Choose your tutor'
             }),
             'company_name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -54,6 +58,13 @@ class PlacementRequestForm(forms.ModelForm):
         self.fields['provider'].queryset = ProviderProfile.objects.filter(
             user__is_active=True
         )
+        # Filter active tutors and set custom label format
+        self.fields['tutor'].queryset = TutorProfile.objects.filter(
+            user__is_active=True
+        )
+        self.fields['tutor'].empty_label = "Choose your tutor"
+        # Customize the label format to show name and department
+        self.fields['tutor'].label_from_instance = lambda obj: f"{obj.user.get_full_name()} - {obj.department}"
 
     def clean(self):
         cleaned_data = super().clean()

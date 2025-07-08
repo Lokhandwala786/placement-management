@@ -12,6 +12,14 @@ class PlacementRequest(models.Model):
     
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     provider = models.ForeignKey(ProviderProfile, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(
+        'accounts.TutorProfile', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='placement_requests',
+        verbose_name='Assigned Tutor'
+    )
     company_name = models.CharField(max_length=200)
     job_title = models.CharField(max_length=100)
     job_description = models.TextField()

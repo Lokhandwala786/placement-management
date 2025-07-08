@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
-from .models import User, StudentProfile, TutorProfile, ProviderProfile
+from .models import User, StudentProfile, TutorProfile, ProviderProfile, Course, Department
 import logging
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class BaseRegistrationForm(UserCreationForm):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': '10-digit phone number'
+            'placeholder': 'UK phone number (e.g., +447911123456)'
         })
     )
     
@@ -116,12 +116,13 @@ class StudentRegistrationForm(BaseRegistrationForm):
             'placeholder': 'Student ID (e.g., CS1234)'
         })
     )
-    course = forms.CharField(
-        max_length=100, 
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.filter(is_active=True),
         required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Course Name'
+        empty_label="Select your course",
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': 'Select your course'
         })
     )
     year = forms.ChoiceField(
@@ -141,6 +142,22 @@ class StudentRegistrationForm(BaseRegistrationForm):
             'max': '10'
         })
     )
+    tutor = forms.ModelChoiceField(
+        queryset=TutorProfile.objects.filter(user__is_active=True),
+        required=False,
+        empty_label="Choose your tutor (optional)",
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': 'Choose your tutor'
+        })
+    )
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filter active courses
+        self.fields['course'].queryset = Course.objects.filter(is_active=True)
+        # Filter active tutors
+        self.fields['tutor'].queryset = TutorProfile.objects.filter(user__is_active=True)
     
     def clean_student_id(self):
         """Validate student ID uniqueness"""
@@ -166,7 +183,8 @@ class StudentRegistrationForm(BaseRegistrationForm):
                     student_id=self.cleaned_data['student_id'],
                     course=self.cleaned_data['course'],
                     year=self.cleaned_data['year'],
-                    cgpa=self.cleaned_data.get('cgpa')
+                    cgpa=self.cleaned_data.get('cgpa'),
+                    tutor=self.cleaned_data.get('tutor')
                 )
                 logger.info(f"New student registered: {user.username}")
             return user
@@ -185,12 +203,13 @@ class TutorRegistrationForm(BaseRegistrationForm):
             'placeholder': 'Employee ID (e.g., EMP123)'
         })
     )
-    department = forms.CharField(
-        max_length=100, 
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.filter(is_active=True),
         required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Department'
+        empty_label="Select your department",
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'placeholder': 'Select your department'
         })
     )
     designation = forms.CharField(

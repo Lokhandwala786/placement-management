@@ -6,6 +6,35 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+class Course(models.Model):
+    """Model for available courses"""
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True)
+    duration_years = models.IntegerField(default=4)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+    
+    class Meta:
+        ordering = ['name']
+
+class Department(models.Model):
+    """Model for available departments"""
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=20, unique=True)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+    
+    class Meta:
+        ordering = ['name']
+
 class User(AbstractUser):
     USER_TYPES = (
         ('student', 'Student'),
@@ -57,9 +86,10 @@ class StudentProfile(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     student_id = models.CharField(max_length=20, unique=True, validators=[validate_student_id])
-    course = models.CharField(max_length=100)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
     year = models.IntegerField(choices=YEAR_CHOICES)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    tutor = models.ForeignKey('TutorProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_students')
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
     address = models.TextField(blank=True)
     
@@ -75,7 +105,7 @@ class StudentProfile(models.Model):
 class TutorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     employee_id = models.CharField(max_length=20, unique=True, validators=[validate_employee_id])
-    department = models.CharField(max_length=100)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='tutors')
     designation = models.CharField(max_length=100)
     office_location = models.CharField(max_length=100, blank=True)
     

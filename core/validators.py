@@ -7,10 +7,12 @@ from django.utils import timezone
 import re
 
 def validate_phone_number(value):
-    """Validate Indian phone number format"""
-    pattern = r'^[6-9]\d{9}$'
+    """Validate UK phone number format"""
+    # UK phone number patterns: +44, 0, or 44 prefix
+    # Examples: +447911123456, 07911123456, 447911123456
+    pattern = r'^(\+44|0|44)?[1-9]\d{8,9}$'
     if not re.match(pattern, value):
-        raise ValidationError('Enter a valid 10-digit Indian phone number starting with 6-9.')
+        raise ValidationError('Enter a valid UK phone number (e.g., +447911123456, 07911123456).')
 
 def validate_student_id(value):
     """Validate student ID format"""

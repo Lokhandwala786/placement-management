@@ -3,7 +3,7 @@ from .models import PlacementRequest, PlacementReport, Message, VisitSchedule
 
 @admin.register(PlacementRequest)
 class PlacementRequestAdmin(admin.ModelAdmin):
-    list_display = ('student', 'company_name', 'job_title', 'status', 'start_date', 'end_date', 'created_at')
+    list_display = ('student', 'tutor', 'company_name', 'job_title', 'status', 'start_date', 'end_date', 'created_at')
     list_filter = ('status', 'start_date', 'end_date', 'created_at')
     search_fields = ('student__user__first_name', 'student__user__last_name', 'company_name', 'job_title')
     ordering = ('-created_at',)
@@ -11,7 +11,7 @@ class PlacementRequestAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('student', 'provider', 'company_name', 'job_title', 'job_description')
+            'fields': ('student', 'provider', 'tutor', 'company_name', 'job_title', 'job_description')
         }),
         ('Placement Details', {
             'fields': ('start_date', 'end_date', 'location', 'latitude', 'longitude')

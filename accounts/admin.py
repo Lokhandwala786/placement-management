@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, StudentProfile, TutorProfile, ProviderProfile
+from .models import User, StudentProfile, TutorProfile, ProviderProfile, Course, Department
 
 # Helper for fieldsets
 if UserAdmin.fieldsets:
@@ -30,33 +30,58 @@ else:
         }),
     )
 
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ['code', 'name', 'duration_years', 'is_active', 'created_at']
+    list_filter = ['is_active', 'duration_years']
+    search_fields = ['name', 'code']
+    ordering = ['name']
+
+@admin.register(Department)
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display = ['code', 'name', 'is_active', 'created_at']
+    list_filter = ['is_active']
+    search_fields = ['name', 'code']
+    ordering = ['name']
+
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'user_type', 'is_verified', 'is_active', 'date_joined')
-    list_filter = ('user_type', 'is_verified', 'is_active', 'date_joined')
-    search_fields = ('username', 'email', 'first_name', 'last_name')
-    ordering = ('-date_joined',)
-    fieldsets = custom_fieldsets
-    add_fieldsets = custom_add_fieldsets
-    pass
+    list_display = ['username', 'email', 'first_name', 'last_name', 'user_type', 'is_active', 'is_verified']
+    list_filter = ['user_type', 'is_active', 'is_verified', 'date_joined']
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+    ordering = ['-date_joined']
+    
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone')}),
+        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Additional Info', {'fields': ('user_type', 'is_verified')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'password1', 'password2', 'user_type', 'phone'),
+        }),
+    )
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'student_id', 'course', 'year', 'cgpa')
-    list_filter = ('course', 'year')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'student_id')
-    ordering = ('user__first_name',)
+    list_display = ['user', 'student_id', 'course', 'year', 'cgpa', 'tutor']
+    list_filter = ['course', 'year', 'tutor']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name', 'student_id']
+    ordering = ['user__first_name']
 
 @admin.register(TutorProfile)
 class TutorProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'employee_id', 'department', 'designation', 'office_location')
-    list_filter = ('department', 'designation')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'employee_id')
-    ordering = ('user__first_name',)
+    list_display = ['user', 'employee_id', 'department', 'designation', 'office_location']
+    list_filter = ['department', 'designation']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name', 'employee_id']
+    ordering = ['user__first_name']
 
 @admin.register(ProviderProfile)
 class ProviderProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'company_name', 'contact_person', 'industry', 'company_size')
-    list_filter = ('industry', 'company_size')
-    search_fields = ('user__username', 'company_name', 'contact_person')
-    ordering = ('company_name',)
+    list_display = ['user', 'company_name', 'contact_person', 'industry']
+    list_filter = ['industry']
+    search_fields = ['company_name', 'contact_person', 'user__username']
+    ordering = ['company_name']
