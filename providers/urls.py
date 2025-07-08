@@ -6,9 +6,6 @@ app_name = 'providers'
 urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('review/<int:pk>/', views.review_placement, name='review_placement'),
-<<<<<<< HEAD
     path('placements/', views.placement_list, name='placement_list'),
     path('profile/', views.profile_update, name='profile_update'),
-=======
->>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 ]

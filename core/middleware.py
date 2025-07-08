@@ -3,15 +3,10 @@ Custom middleware for error handling and logging
 """
 import logging
 from django.http import HttpResponseServerError, HttpResponseNotFound
-<<<<<<< HEAD
 from django.shortcuts import render, redirect
 from django.conf import settings
 from django.urls import reverse
 from django.contrib import messages
-=======
-from django.shortcuts import render
-from django.conf import settings
->>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +29,6 @@ class ErrorHandlingMiddleware:
         
         # Return custom error page in production
         return render(request, 'errors/500.html', status=500)
-<<<<<<< HEAD
 
 class UserTypeMiddleware:
     """Middleware to handle user type-specific redirects and permissions"""
@@ -65,5 +59,3 @@ class UserTypeMiddleware:
                 return redirect('accounts:login')
         
         return None
-=======
->>>>>>> b9a71299f58466dadbc8f45d928481dbabe2da88
