@@ -3,47 +3,33 @@ from django.contrib import messages
 from django.utils import timezone
 from core.decorators import provider_required, handle_exceptions
 from placements.models import PlacementRequest
+from .models import PublishOpportunity
 import logging
+from .forms import PublishOpportunityForm
+from django.contrib import messages
+from django.shortcuts import redirect
 
 logger = logging.getLogger(__name__)
 
 @provider_required
 @handle_exceptions
 def dashboard(request):
-    """Enhanced provider dashboard"""
+    """Provider dashboard with opportunity stats"""
     provider_profile = request.user.providerprofile
-    
-    pending_requests = PlacementRequest.objects.filter(
-        provider=provider_profile,
-        status='pending'
-    ).order_by('-created_at')
-    
-    approved_requests = PlacementRequest.objects.filter(
-        provider=provider_profile,
-        status__in=['approved_by_provider', 'approved_by_tutor', 'completed']
-    ).order_by('-created_at')
-    
-    rejected_requests = PlacementRequest.objects.filter(
-        provider=provider_profile,
-        status='rejected'
-    ).order_by('-created_at')
-    
-    # Statistics
-    total_requests = PlacementRequest.objects.filter(provider=provider_profile).count()
-    pending_count = pending_requests.count()
-    approved_count = approved_requests.count()
-    rejected_count = rejected_requests.count()
-    
+
+    # Stats for PublishOpportunity
+    total_opps = PublishOpportunity.objects.filter(provider=provider_profile).count()
+    pending_opps = PublishOpportunity.objects.filter(provider=provider_profile, status='pending').count()
+    approved_opps = PublishOpportunity.objects.filter(provider=provider_profile, status='approved').count()
+    rejected_opps = PublishOpportunity.objects.filter(provider=provider_profile, status='rejected').count()
+
     context = {
         'provider_profile': provider_profile,
-        'pending_requests': pending_requests[:5],  # Latest 5
-        'approved_requests': approved_requests[:5],  # Latest 5
-        'rejected_requests': rejected_requests[:3],  # Latest 3
         'stats': {
-            'total': total_requests,
-            'pending': pending_count,
-            'approved': approved_count,
-            'rejected': rejected_count,
+            'total': total_opps,
+            'pending': pending_opps,
+            'approved': approved_opps,
+            'rejected': rejected_opps,
         }
     }
     return render(request, 'providers/dashboard.html', context)
@@ -140,3 +126,20 @@ def profile_update(request):
         'provider_profile': provider_profile,
     }
     return render(request, 'providers/profile_update.html', context)
+
+@provider_required
+@handle_exceptions
+def publish_opportunity(request):
+    provider_profile = request.user.providerprofile
+    if request.method == 'POST':
+        form = PublishOpportunityForm(request.POST)
+        if form.is_valid():
+            opportunity = form.save(commit=False)
+            opportunity.provider = provider_profile
+            opportunity.status = 'pending'
+            opportunity.save()
+            messages.success(request, 'Opportunity published successfully and is pending approval!')
+            return redirect('providers:dashboard')
+    else:
+        form = PublishOpportunityForm()
+    return render(request, 'providers/publish_opportunity.html', {'form': form})

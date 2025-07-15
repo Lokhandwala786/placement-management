@@ -253,42 +253,21 @@ class TutorRegistrationForm(BaseRegistrationForm):
             raise ValidationError("Registration failed. Please try again.")
 
 class ProviderRegistrationForm(BaseRegistrationForm):
-    """Enhanced provider registration form"""
-    
-    company_name = forms.CharField(
-        max_length=200, 
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Company Name'
-        })
-    )
-    company_address = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'placeholder': 'Company Address',
-            'rows': 3
-        }),
-        required=True
-    )
-    contact_person = forms.CharField(
-        max_length=100, 
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Contact Person Name'
-        })
-    )
-    website = forms.URLField(
-        required=False,
-        widget=forms.URLInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Company Website (optional)'
-        })
-    )
-    
+    """Provider registration form with only basic fields: name, Gmail, username, password."""
+    # No extra fields; only those from BaseRegistrationForm
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Update placeholders for provider context if needed
+        self.fields['first_name'].widget.attrs['placeholder'] = 'First Name'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Last Name'
+        self.fields['email'].widget.attrs['placeholder'] = 'Gmail Address'
+        self.fields['username'].widget.attrs['placeholder'] = 'Choose a username'
+        self.fields['password1'].widget.attrs['placeholder'] = 'Password (min 8 characters)'
+        self.fields['password2'].widget.attrs['placeholder'] = 'Confirm password'
+
     def save(self, commit=True):
-        """Enhanced save method with error handling"""
+        """Save provider with only basic info."""
         try:
             user = super().save(commit=False)
             user.user_type = 'provider'
@@ -296,16 +275,9 @@ class ProviderRegistrationForm(BaseRegistrationForm):
             user.last_name = self.cleaned_data['last_name']
             user.email = self.cleaned_data['email']
             user.phone = self.cleaned_data['phone']
-            
             if commit:
                 user.save()
-                ProviderProfile.objects.create(
-                    user=user,
-                    company_name=self.cleaned_data['company_name'],
-                    company_address=self.cleaned_data['company_address'],
-                    contact_person=self.cleaned_data['contact_person'],
-                    website=self.cleaned_data.get('website', '')
-                )
+                ProviderProfile.objects.create(user=user)
                 logger.info(f"New provider registered: {user.username}")
             return user
         except Exception as e:

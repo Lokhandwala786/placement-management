@@ -16,7 +16,6 @@
                 <div class="card-body">
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.first_name.id_for_label }}" class="form-label">
@@ -31,7 +30,6 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.last_name.id_for_label }}" class="form-label">
                                     <i class="fas fa-user me-1"></i>Last Name *
@@ -46,7 +44,6 @@
                                 {% endif %}
                             </div>
                         </div>
-                        
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.username.id_for_label }}" class="form-label">
@@ -61,23 +58,6 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.contact_person.id_for_label }}" class="form-label">
-                                    <i class="fas fa-user-tie me-1"></i>Contact Person *
-                                </label>
-                                {{ form.contact_person }}
-                                {% if form.contact_person.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {% for error in form.contact_person.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.email.id_for_label }}" class="form-label">
                                     <i class="fas fa-envelope me-1"></i>Email Address *
@@ -91,7 +71,8 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            
+                        </div>
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.phone.id_for_label }}" class="form-label">
                                     <i class="fas fa-phone me-1"></i>Phone Number *
@@ -105,51 +86,6 @@
                                     </div>
                                 {% endif %}
                             </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.company_name.id_for_label }}" class="form-label">
-                                <i class="fas fa-building me-1"></i>Company Name *
-                            </label>
-                            {{ form.company_name }}
-                            {% if form.company_name.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.company_name.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.company_address.id_for_label }}" class="form-label">
-                                <i class="fas fa-map-marker-alt me-1"></i>Company Address *
-                            </label>
-                            {{ form.company_address }}
-                            {% if form.company_address.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.company_address.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.website.id_for_label }}" class="form-label">
-                                <i class="fas fa-globe me-1"></i>Company Website (Optional)
-                            </label>
-                            {{ form.website }}
-                            {% if form.website.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {% for error in form.website.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.password1.id_for_label }}" class="form-label">
                                     <i class="fas fa-lock me-1"></i>Password *
@@ -163,22 +99,20 @@
                                     </div>
                                 {% endif %}
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                    <i class="fas fa-lock me-1"></i>Confirm Password *
-                                </label>
-                                {{ form.password2 }}
-                                {% if form.password2.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {% for error in form.password2.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
                         </div>
-                        
+                        <div class="mb-3">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Confirm Password *
+                            </label>
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.password2.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">
                                 {% for error in form.non_field_errors %}
@@ -186,13 +120,11 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        
                         <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-warning btn-lg">
                                 <i class="fas fa-user-plus me-2"></i>Create Provider Account
                             </button>
                         </div>
-                        
                         <div class="text-center">
                             <small class="text-muted">
                                 By registering, you agree to our 
