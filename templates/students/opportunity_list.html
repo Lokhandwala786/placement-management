@@ -1,0 +1,61 @@
+{% extends 'index.html' %}
+
+{% block title %}Available Opportunities - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-briefcase me-2"></i>Available Opportunities
+            </h2>
+            {% if opportunities %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Title</th>
+                                <th>Provider</th>
+                                <th>Location</th>
+                                <th>Type</th>
+                                <th>Stipend/Salary</th>
+                                <th>Deadline</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for opp in opportunities %}
+                            <tr>
+                                <td><strong>{{ opp.title }}</strong></td>
+                                <td>{{ opp.provider.user.get_full_name }}</td>
+                                <td>{{ opp.location }}</td>
+                                <td>{{ opp.get_type_display }}</td>
+                                <td>{{ opp.stipend_salary }}</td>
+                                <td>{{ opp.application_deadline|date:'M d, Y' }}</td>
+                                <td>
+                                    <form method="post" action="{% url 'students:apply_opportunity' opp.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="fas fa-paper-plane me-1"></i>Apply
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>No opportunities available at the moment.
+                </div>
+            {% endif %}
+            <div class="mt-3">
+                <a href="{% url 'students:dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

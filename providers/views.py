@@ -2,19 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from core.decorators import provider_required, handle_exceptions
-from placements.models import PlacementRequest
 from .models import PublishOpportunity
+from placements.models import PlacementRequest
 import logging
 from .forms import PublishOpportunityForm
 from django.contrib import messages
 from django.shortcuts import redirect
+from accounts.models import StudentProfile
 
 logger = logging.getLogger(__name__)
 
 @provider_required
 @handle_exceptions
 def dashboard(request):
-    """Provider dashboard with opportunity stats"""
+    """Provider dashboard with opportunity stats and pending placement requests"""
     provider_profile = request.user.providerprofile
 
     # Stats for PublishOpportunity
@@ -23,6 +24,12 @@ def dashboard(request):
     approved_opps = PublishOpportunity.objects.filter(provider=provider_profile, status='approved').count()
     rejected_opps = PublishOpportunity.objects.filter(provider=provider_profile, status='rejected').count()
 
+    # Pending placement requests for this provider's opportunities
+    pending_requests = PlacementRequest.objects.filter(
+        provider=provider_profile,
+        status='pending'
+    ).order_by('-created_at')[:5]
+
     context = {
         'provider_profile': provider_profile,
         'stats': {
@@ -30,7 +37,8 @@ def dashboard(request):
             'pending': pending_opps,
             'approved': approved_opps,
             'rejected': rejected_opps,
-        }
+        },
+        'pending_requests': pending_requests,
     }
     return render(request, 'providers/dashboard.html', context)
 
@@ -136,10 +144,16 @@ def publish_opportunity(request):
         if form.is_valid():
             opportunity = form.save(commit=False)
             opportunity.provider = provider_profile
-            opportunity.status = 'pending'
+            opportunity.status = 'approved'  # Auto-approve
             opportunity.save()
-            messages.success(request, 'Opportunity published successfully and is pending approval!')
+            messages.success(request, 'Opportunity published successfully and is now live!')
             return redirect('providers:dashboard')
     else:
         form = PublishOpportunityForm()
     return render(request, 'providers/publish_opportunity.html', {'form': form})
+
+@provider_required
+@handle_exceptions
+def view_student(request, pk):
+    student = get_object_or_404(StudentProfile, pk=pk)
+    return render(request, 'providers/view_student.html', {'student': student})

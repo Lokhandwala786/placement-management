@@ -6,6 +6,8 @@ from placements.models import PlacementRequest, PlacementReport
 from accounts.models import ProviderProfile
 from .forms import PlacementRequestForm, PlacementReportForm
 import logging
+from providers.models import PublishOpportunity
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -118,3 +120,37 @@ def submit_report(request, pk):
         'form': form, 
         'placement_request': placement_request
     })
+
+@student_required
+@handle_exceptions
+def opportunity_list(request):
+    """Show all approved/published opportunities to students."""
+    today = timezone.now().date()
+    opportunities = PublishOpportunity.objects.filter(status='approved', application_deadline__gte=today).order_by('-created_at')
+    return render(request, 'students/opportunity_list.html', {'opportunities': opportunities})
+
+@student_required
+@handle_exceptions
+def apply_opportunity(request, opportunity_id):
+    """Handle student applying to an opportunity."""
+    opportunity = get_object_or_404(PublishOpportunity, pk=opportunity_id, status='approved')
+    student_profile = request.user.studentprofile
+    # Prevent duplicate applications
+    from placements.models import PlacementRequest
+    if PlacementRequest.objects.filter(student=student_profile, company_name=opportunity.title, job_title=opportunity.title, provider=opportunity.provider).exists():
+        messages.warning(request, 'You have already applied for this opportunity.')
+        return redirect('students:opportunity_list')
+    # Create PlacementRequest
+    placement_request = PlacementRequest.objects.create(
+        student=student_profile,
+        provider=opportunity.provider,
+        company_name=opportunity.title,
+        job_title=opportunity.title,
+        job_description=opportunity.description,
+        start_date=opportunity.start_date or timezone.now().date(),
+        end_date=opportunity.start_date or timezone.now().date(),
+        location=opportunity.location,
+        status='pending',
+    )
+    messages.success(request, 'Your application has been submitted and is pending approval!')
+    return redirect('students:dashboard')
