@@ -7,6 +7,10 @@ from django.urls import reverse_lazy
 from core.decorators import handle_exceptions
 from .forms import CustomAuthenticationForm, StudentRegistrationForm, TutorRegistrationForm, ProviderRegistrationForm
 import logging
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import ProviderProfile, User
 
 logger = logging.getLogger(__name__)
 
@@ -92,30 +96,52 @@ def register_tutor(request):
         'icon': 'fas fa-chalkboard-teacher'
     })
 
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
 @handle_exceptions
 def register_provider(request):
-    """Enhanced provider registration view"""
+    """Provider registration with OTP email verification"""
     if request.method == 'POST':
         form = ProviderRegistrationForm(request.POST)
         if form.is_valid():
-            try:
-                user = form.save()
-                login(request, user)
-                messages.success(request, 'Provider registration successful! Welcome to the platform.')
-                return redirect('providers:dashboard')
-            except Exception as e:
-                logger.error(f"Provider registration error: {str(e)}")
-                messages.error(request, 'Registration failed. Please try again.')
-        else:
-            messages.error(request, 'Please correct the errors below.')
+            user = form.save(commit=False)
+            user.is_active = False
+            user.is_verified = False
+            user.save()
+            ProviderProfile.objects.create(user=user)
+            otp = generate_otp()
+            request.session['provider_otp'] = otp
+            request.session['provider_user_id'] = user.id
+            send_mail(
+                'Your Provider Registration OTP',
+                f'Your OTP for provider registration is: {otp}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email]
+            )
+            return redirect('accounts:provider_otp_verify')
     else:
         form = ProviderRegistrationForm()
-    
-    return render(request, 'accounts/register_provider.html', {
-        'form': form,
-        'user_type': 'Provider',
-        'icon': 'fas fa-building'
-    })
+    return render(request, 'accounts/register_provider.html', {'form': form, 'user_type': 'Provider', 'icon': 'fas fa-building'})
+
+
+def provider_otp_verify(request):
+    if request.method == 'POST':
+        input_otp = request.POST.get('otp')
+        session_otp = request.session.get('provider_otp')
+        user_id = request.session.get('provider_user_id')
+        if input_otp == session_otp:
+            user = User.objects.get(id=user_id)
+            user.is_active = True
+            user.is_verified = True
+            user.save()
+            del request.session['provider_otp']
+            del request.session['provider_user_id']
+            messages.success(request, 'Your account has been verified! You can now log in.')
+            return redirect('accounts:login')
+        else:
+            messages.error(request, 'Invalid OTP. Please try again.')
+    return render(request, 'accounts/provider_otp_verify.html')
 
 def register_choice(request):
     """Registration choice view"""
