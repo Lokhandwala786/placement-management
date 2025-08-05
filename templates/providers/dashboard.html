@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="container py-5">
+    <!-- Header Section -->
     <div class="row">
         <div class="col-12 text-center">
             <h2 class="mb-4">
@@ -15,43 +16,277 @@
             </a>
         </div>
     </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-briefcase fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ stats.total }}</h5>
+                    <p class="card-text">Total Opportunities</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ stats.approved }}</h5>
+                    <p class="card-text">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ stats.pending }}</h5>
+                    <p class="card-text">Pending</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-times-circle fa-2x mb-2"></i>
+                    <h5 class="card-title">{{ stats.rejected }}</h5>
+                    <p class="card-text">Rejected</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publish History Section -->
     <div class="row mt-5">
         <div class="col-12">
-            <h4 class="mb-3"><i class="fas fa-user-check me-2"></i>Placement Requests</h4>
-            {% if pending_requests %}
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Student</th>
-                            <th>Opportunity</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for req in pending_requests %}
-                        <tr>
-                            <td>{{ req.student.user.get_full_name }}</td>
-                            <td>{{ req.opportunity.title }}</td>
-                            <td><span class="badge bg-warning text-dark">Pending</span></td>
-                            <td>
-                                <form method="post" action="{% url 'providers:review_placement' req.pk %}" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button name="action" value="approve" class="btn btn-success btn-sm">Approve</button>
-                                    <button name="action" value="reject" class="btn btn-danger btn-sm ms-1">Reject</button>
-                                </form>
-                                <a href="{% url 'providers:view_student' req.student.pk %}" class="btn btn-info btn-sm ms-2">View Student Details</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Publish History
+                        <a href="{% url 'providers:publish_opportunity' %}" class="btn btn-light btn-sm float-end">
+                            <i class="fas fa-plus me-1"></i>Publish New
+                        </a>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_opportunities %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Deadline</th>
+                                    <th>Applications</th>
+                                    <th>Published</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for opp in recent_opportunities %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ opp.title }}</strong><br>
+                                        <small class="text-muted">{{ opp.stipend_salary|default:"Salary not specified" }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ opp.get_type_display }}</span>
+                                    </td>
+                                    <td>{{ opp.location }}</td>
+                                    <td>
+                                        {% if opp.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% elif opp.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif opp.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if opp.application_deadline %}
+                                            <span class="{% if opp.application_deadline < today %}text-danger{% endif %}">
+                                                {{ opp.application_deadline|date:"M d, Y" }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">No deadline</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ opp.number_of_openings|default:"N/A" }} openings</span>
+                                    </td>
+                                    <td>{{ opp.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#opportunityModal{{ opp.id }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a href="#" class="btn btn-outline-info btn-sm">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No opportunities published yet</h5>
+                        <p class="text-muted">Start by publishing your first opportunity!</p>
+                        <a href="{% url 'providers:publish_opportunity' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Publish First Opportunity
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            {% else %}
-            <div class="alert alert-info">No pending placement requests at the moment.</div>
-            {% endif %}
+        </div>
+    </div>
+
+    <!-- Placement Requests Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-check me-2"></i>Pending Placement Requests
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_requests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Course</th>
+                                    <th>Job Title</th>
+                                    <th>Applied Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in pending_requests %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ req.student.user.get_full_name }}</strong><br>
+                                        <small class="text-muted">{{ req.student.student_id }}</small>
+                                    </td>
+                                    <td>{{ req.student.course.name }}</td>
+                                    <td>{{ req.job_title }}</td>
+                                    <td>{{ req.created_at|date:"M d, Y" }}</td>
+                                    <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <form method="post" action="{% url 'providers:review_placement' req.pk %}" style="display:inline;">
+                                                {% csrf_token %}
+                                                <button name="action" value="approve" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button name="action" value="reject" class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                            <a href="{% url 'providers:view_student' req.student.pk %}" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No pending placement requests at the moment.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Opportunity Detail Modals -->
+{% for opp in recent_opportunities %}
+<div class="modal fade" id="opportunityModal{{ opp.id }}" tabindex="-1" aria-labelledby="opportunityModalLabel{{ opp.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="opportunityModalLabel{{ opp.id }}">
+                    <i class="fas fa-briefcase me-2"></i>{{ opp.title }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Job Details</h6>
+                        <dl class="row">
+                            <dt class="col-sm-4">Type</dt>
+                            <dd class="col-sm-8">{{ opp.get_type_display }}</dd>
+                            <dt class="col-sm-4">Location</dt>
+                            <dd class="col-sm-8">{{ opp.location }}</dd>
+                            <dt class="col-sm-4">Salary/Stipend</dt>
+                            <dd class="col-sm-8">{{ opp.stipend_salary|default:"Not specified" }}</dd>
+                            <dt class="col-sm-4">Duration</dt>
+                            <dd class="col-sm-8">{{ opp.duration|default:"Not specified" }}</dd>
+                            <dt class="col-sm-4">Openings</dt>
+                            <dd class="col-sm-8">{{ opp.number_of_openings|default:"Not specified" }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Timeline</h6>
+                        <dl class="row">
+                            <dt class="col-sm-4">Start Date</dt>
+                            <dd class="col-sm-8">{{ opp.start_date|date:"M d, Y"|default:"Not specified" }}</dd>
+                            <dt class="col-sm-4">Deadline</dt>
+                            <dd class="col-sm-8">{{ opp.application_deadline|date:"M d, Y" }}</dd>
+                            <dt class="col-sm-4">Published</dt>
+                            <dd class="col-sm-8">{{ opp.created_at|date:"M d, Y" }}</dd>
+                            <dt class="col-sm-4">Status</dt>
+                            <dd class="col-sm-8">
+                                {% if opp.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif opp.status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif opp.status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Description</h6>
+                        <p>{{ opp.description }}</p>
+                    </div>
+                </div>
+                {% if opp.eligibility %}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Eligibility</h6>
+                        <p>{{ opp.eligibility }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" class="btn btn-primary">Edit Opportunity</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endblock %} 

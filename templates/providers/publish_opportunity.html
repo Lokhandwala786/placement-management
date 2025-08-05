@@ -49,4 +49,48 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date for date inputs to today
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Set min attribute for application deadline
+    const deadlineInput = document.querySelector('input[name="application_deadline"]');
+    if (deadlineInput) {
+        deadlineInput.setAttribute('min', today);
+        deadlineInput.addEventListener('change', function() {
+            if (this.value < today) {
+                this.setCustomValidity('Application deadline must be in the future.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Set min attribute for start date
+    const startDateInput = document.querySelector('input[name="start_date"]');
+    if (startDateInput) {
+        startDateInput.setAttribute('min', today);
+        startDateInput.addEventListener('change', function() {
+            if (this.value < today) {
+                this.setCustomValidity('Start date must be in the future.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Validate that start date is after deadline
+    if (deadlineInput && startDateInput) {
+        startDateInput.addEventListener('change', function() {
+            if (deadlineInput.value && this.value && this.value <= deadlineInput.value) {
+                this.setCustomValidity('Start date must be after application deadline.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+</script>
 {% endblock %} 

@@ -28,6 +28,16 @@
                                         {{ form.provider.errors.0 }}
                                     </div>
                                 {% endif %}
+                                <div id="provider-details" class="mt-2" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <small>
+                                            <strong>Provider Details:</strong><br>
+                                            <span id="provider-company"></span><br>
+                                            <span id="provider-contact"></span><br>
+                                            <span id="provider-email"></span>
+                                        </small>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="col-md-6 mb-3">
@@ -92,6 +102,7 @@
                                         {{ form.start_date.errors.0 }}
                                     </div>
                                 {% endif %}
+                                <div class="form-text">Date must be in the future</div>
                             </div>
                         </div>
                         
@@ -106,6 +117,7 @@
                                         {{ form.end_date.errors.0 }}
                                     </div>
                                 {% endif %}
+                                <div class="form-text">Date must be in the future</div>
                             </div>
                         </div>
                         
@@ -156,4 +168,89 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const providerSelect = document.getElementById('{{ form.provider.id_for_label }}');
+    const providerDetails = document.getElementById('provider-details');
+    const providerCompany = document.getElementById('provider-company');
+    const providerContact = document.getElementById('provider-contact');
+    const providerEmail = document.getElementById('provider-email');
+    
+    // Provider details data (you can make this dynamic via AJAX if needed)
+    const providerData = {
+        {% for provider in form.provider.queryset %}
+        '{{ provider.pk }}': {
+            company: '{{ provider.company_name }}',
+            contact: '{{ provider.contact_person }}',
+            email: '{{ provider.user.email }}',
+            address: '{{ provider.company_address|escapejs }}',
+            website: '{{ provider.website|default:"" }}',
+            industry: '{{ provider.industry|default:"" }}'
+        },
+        {% endfor %}
+    };
+    
+    function updateProviderDetails() {
+        const selectedValue = providerSelect.value;
+        if (selectedValue && providerData[selectedValue]) {
+            const data = providerData[selectedValue];
+            providerCompany.textContent = `Company: ${data.company}`;
+            providerContact.textContent = `Contact: ${data.contact}`;
+            providerEmail.textContent = `Email: ${data.email}`;
+            providerDetails.style.display = 'block';
+        } else {
+            providerDetails.style.display = 'none';
+        }
+    }
+    
+    providerSelect.addEventListener('change', updateProviderDetails);
+    
+    // Show details if provider is pre-selected (e.g., on form errors)
+    if (providerSelect.value) {
+        updateProviderDetails();
+    }
+    });
+    
+    // Set minimum date for date inputs to today
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Set min attribute for start date
+    const startDateInput = document.querySelector('input[name="start_date"]');
+    if (startDateInput) {
+        startDateInput.setAttribute('min', today);
+        startDateInput.addEventListener('change', function() {
+            if (this.value < today) {
+                this.setCustomValidity('Start date must be in the future.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Set min attribute for end date
+    const endDateInput = document.querySelector('input[name="end_date"]');
+    if (endDateInput) {
+        endDateInput.setAttribute('min', today);
+        endDateInput.addEventListener('change', function() {
+            if (this.value < today) {
+                this.setCustomValidity('End date must be in the future.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Validate that end date is after start date
+    if (startDateInput && endDateInput) {
+        endDateInput.addEventListener('change', function() {
+            if (startDateInput.value && this.value && this.value <= startDateInput.value) {
+                this.setCustomValidity('End date must be after start date.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+</script>
 {% endblock %} 

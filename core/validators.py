@@ -8,14 +8,12 @@ import re
 
 def validate_phone_number(value):
     """Validate UK phone number format"""
-    # UK phone number patterns: +44, 0, or 44 prefix
-    # Examples: +447911123456, 07911123456, 447911123456
     pattern = r'^(\+44|0|44)?[1-9]\d{8,9}$'
     if not re.match(pattern, value):
         raise ValidationError('Enter a valid UK phone number (e.g., +447911123456, 07911123456).')
 
 def validate_student_id(value):
-    """Validate student ID format"""
+    
     pattern = r'^[A-Z]{2,3}\d{4,6}$'
     if not re.match(pattern, value.upper()):
         raise ValidationError('Student ID must be in format: ABC1234 or AB123456')

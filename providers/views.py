@@ -9,6 +9,7 @@ from .forms import PublishOpportunityForm
 from django.contrib import messages
 from django.shortcuts import redirect
 from accounts.models import StudentProfile
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,12 @@ def dashboard(request):
     pending_requests = PlacementRequest.objects.filter(
         provider=provider_profile,
         status='pending'
-    ).order_by('-created_at')[:5]
+    ).select_related('student__user', 'student__course').order_by('-created_at')[:5]
+
+    # Recent published opportunities (last 10)
+    recent_opportunities = PublishOpportunity.objects.filter(
+        provider=provider_profile
+    ).order_by('-created_at')[:10]
 
     context = {
         'provider_profile': provider_profile,
@@ -39,6 +45,8 @@ def dashboard(request):
             'rejected': rejected_opps,
         },
         'pending_requests': pending_requests,
+        'recent_opportunities': recent_opportunities,
+        'today': date.today(),
     }
     return render(request, 'providers/dashboard.html', context)
 
@@ -64,6 +72,7 @@ def review_placement(request, pk):
             if action == 'approve':
                 placement_request.status = 'approved_by_provider'
                 placement_request.provider_approved_at = timezone.now()
+                placement_request.provider_comments = comments
                 placement_request.save()
                 
                 logger.info(f"Placement approved by provider {request.user.username}: {pk}")
@@ -71,6 +80,7 @@ def review_placement(request, pk):
                 
             elif action == 'reject':
                 placement_request.status = 'rejected'
+                placement_request.provider_comments = comments
                 placement_request.save()
                 
                 logger.info(f"Placement rejected by provider {request.user.username}: {pk}")
@@ -155,5 +165,20 @@ def publish_opportunity(request):
 @provider_required
 @handle_exceptions
 def view_student(request, pk):
-    student = get_object_or_404(StudentProfile, pk=pk)
-    return render(request, 'providers/view_student.html', {'student': student})
+    """View detailed student information"""
+    student = get_object_or_404(
+        StudentProfile.objects.select_related('user', 'course', 'tutor__user'), 
+        pk=pk
+    )
+    
+    # Get placement requests for this student from this provider
+    placement_requests = PlacementRequest.objects.filter(
+        student=student,
+        provider=request.user.providerprofile
+    ).order_by('-created_at')
+    
+    context = {
+        'student': student,
+        'placement_requests': placement_requests,
+    }
+    return render(request, 'providers/view_student.html', context)

@@ -44,6 +44,10 @@ class PlacementRequest(models.Model):
         related_name='approved_placements'
     )
     
+    # Comments and feedback
+    tutor_comments = models.TextField(blank=True, help_text="Comments from tutor during approval/rejection")
+    provider_comments = models.TextField(blank=True, help_text="Comments from provider during approval/rejection")
+    
     def __str__(self):
         return f"{self.student.user.get_full_name()} - {self.company_name}"
 

@@ -15,7 +15,7 @@ from .models import ProviderProfile, User
 logger = logging.getLogger(__name__)
 
 class CustomLoginView(LoginView):
-    """Enhanced login view with better error handling"""
+    
     template_name = 'accounts/login.html'
     form_class = CustomAuthenticationForm
     
@@ -39,7 +39,7 @@ class CustomLoginView(LoginView):
         return super().form_invalid(form)
 
 class CustomLogoutView(LogoutView):
-    """Enhanced logout view"""
+    
     
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -48,7 +48,7 @@ class CustomLogoutView(LogoutView):
 
 @handle_exceptions
 def register_student(request):
-    """Enhanced student registration view"""
+    
     if request.method == 'POST':
         form = StudentRegistrationForm(request.POST)
         if form.is_valid():

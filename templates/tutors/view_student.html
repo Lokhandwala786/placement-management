@@ -134,13 +134,13 @@
                         </div>
                     </div>
                     {% endif %}
-                    
-                    <!-- Placement Requests Section -->
-                    {% if placement_requests %}
+
+                    <!-- Placement History Section -->
+                    {% if all_placements %}
                     <div class="row mb-4">
                         <div class="col-12">
                             <h5 class="text-primary mb-3">
-                                <i class="fas fa-briefcase me-2"></i>Placement Requests History
+                                <i class="fas fa-briefcase me-2"></i>Placement History
                             </h5>
                             <div class="table-responsive">
                                 <table class="table table-sm table-bordered table-hover">
@@ -151,28 +151,34 @@
                                             <th>Status</th>
                                             <th>Applied Date</th>
                                             <th>Last Updated</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for request in placement_requests %}
+                                        {% for placement in all_placements %}
                                         <tr>
-                                            <td><strong>{{ request.job_title }}</strong></td>
-                                            <td>{{ request.company_name }}</td>
+                                            <td><strong>{{ placement.job_title }}</strong></td>
+                                            <td>{{ placement.company_name }}</td>
                                             <td>
-                                                {% if request.status == 'pending' %}
+                                                {% if placement.status == 'pending' %}
                                                     <span class="badge bg-warning text-dark">Pending</span>
-                                                {% elif request.status == 'approved_by_provider' %}
+                                                {% elif placement.status == 'approved_by_provider' %}
                                                     <span class="badge bg-info">Approved by Provider</span>
-                                                {% elif request.status == 'approved_by_tutor' %}
+                                                {% elif placement.status == 'approved_by_tutor' %}
                                                     <span class="badge bg-success">Approved by Tutor</span>
-                                                {% elif request.status == 'rejected' %}
+                                                {% elif placement.status == 'rejected' %}
                                                     <span class="badge bg-danger">Rejected</span>
-                                                {% elif request.status == 'completed' %}
+                                                {% elif placement.status == 'completed' %}
                                                     <span class="badge bg-primary">Completed</span>
                                                 {% endif %}
                                             </td>
-                                            <td>{{ request.created_at|date:"M d, Y" }}</td>
-                                            <td>{{ request.updated_at|date:"M d, Y" }}</td>
+                                            <td>{{ placement.created_at|date:"M d, Y" }}</td>
+                                            <td>{{ placement.updated_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'tutors:placement_detail' placement.pk %}" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -181,7 +187,48 @@
                         </div>
                     </div>
                     {% endif %}
-                    
+
+                    <!-- Visit Schedules Section -->
+                    {% if visit_schedules %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-calendar-check me-2"></i>Visit Schedules
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Visit Date</th>
+                                            <th>Company</th>
+                                            <th>Purpose</th>
+                                            <th>Status</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for visit in visit_schedules %}
+                                        <tr>
+                                            <td>{{ visit.visit_date|date:"M d, Y H:i" }}</td>
+                                            <td>{{ visit.placement_request.company_name }}</td>
+                                            <td>{{ visit.purpose }}</td>
+                                            <td>
+                                                {% if visit.completed %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Scheduled</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ visit.notes|default:'-' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <!-- Action Buttons -->
                     <div class="row mt-4">
                         <div class="col-12 text-center">
@@ -193,6 +240,9 @@
                                 <i class="fas fa-eye me-2"></i>View Resume
                             </a>
                             {% endif %}
+                            <a href="{% url 'tutors:placement_records' %}?student={{ student.pk }}" class="btn btn-info">
+                                <i class="fas fa-list me-2"></i>View All Placements
+                            </a>
                         </div>
                     </div>
                 </div>

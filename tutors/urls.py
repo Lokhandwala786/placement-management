@@ -10,6 +10,7 @@ urlpatterns = [
     path('bulk-action/', views.bulk_action, name='bulk_action'),
     path('placement-records/', views.placement_records, name='placement_records'),
     path('placement/<int:pk>/', views.placement_detail, name='placement_detail'),
+    path('student/<int:pk>/', views.view_student, name='view_student'),
     path('export/', views.export_placements, name='export_placements'),
     path('schedule/<int:pk>/', views.schedule_visit, name='schedule_visit'),
     path('calendar/', views.calendar_view, name='calendar'),

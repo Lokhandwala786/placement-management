@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from placements.models import PlacementRequest, PlacementReport
 from accounts.models import ProviderProfile, TutorProfile
 from core.validators import validate_future_date, validate_file_size, validate_file_extension
@@ -54,10 +55,14 @@ class PlacementRequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Filter active providers
+        # Filter active providers and set custom label format
         self.fields['provider'].queryset = ProviderProfile.objects.filter(
             user__is_active=True
         )
+        self.fields['provider'].empty_label = "Select placement provider"
+        # Customize the provider label format to show provider name
+        self.fields['provider'].label_from_instance = lambda obj: f"{obj.user.get_full_name()}"
+        
         # Filter active tutors and set custom label format
         self.fields['tutor'].queryset = TutorProfile.objects.filter(
             user__is_active=True
@@ -66,6 +71,20 @@ class PlacementRequestForm(forms.ModelForm):
         # Customize the label format to show name and department
         self.fields['tutor'].label_from_instance = lambda obj: f"{obj.user.get_full_name()} - {obj.department}"
 
+    def clean_start_date(self):
+        """Validate that start date is in the future"""
+        start_date = self.cleaned_data.get('start_date')
+        if start_date and start_date <= timezone.now().date():
+            raise forms.ValidationError('Start date must be in the future.')
+        return start_date
+    
+    def clean_end_date(self):
+        """Validate that end date is in the future"""
+        end_date = self.cleaned_data.get('end_date')
+        if end_date and end_date <= timezone.now().date():
+            raise forms.ValidationError('End date must be in the future.')
+        return end_date
+    
     def clean(self):
         cleaned_data = super().clean()
         start_date = cleaned_data.get('start_date')

@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class CustomAuthenticationForm(AuthenticationForm):
-    """Enhanced login form with better styling and validation"""
+    
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

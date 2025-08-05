@@ -129,3 +129,29 @@ class ExportForm(forms.Form):
             'type': 'date'
         })
     )
+    
+    def clean_custom_start_date(self):
+        """Validate that custom start date is not in the past"""
+        start_date = self.cleaned_data.get('custom_start_date')
+        if start_date and start_date < timezone.now().date():
+            raise forms.ValidationError('Start date cannot be in the past.')
+        return start_date
+    
+    def clean_custom_end_date(self):
+        """Validate that custom end date is not in the past"""
+        end_date = self.cleaned_data.get('custom_end_date')
+        if end_date and end_date < timezone.now().date():
+            raise forms.ValidationError('End date cannot be in the past.')
+        return end_date
+    
+    def clean(self):
+        """Validate date range relationships"""
+        cleaned_data = super().clean()
+        start_date = cleaned_data.get('custom_start_date')
+        end_date = cleaned_data.get('custom_end_date')
+        
+        if start_date and end_date:
+            if start_date > end_date:
+                raise forms.ValidationError('Start date must be before end date.')
+        
+        return cleaned_data

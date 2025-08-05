@@ -6,6 +6,7 @@ from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from core.decorators import tutor_required, handle_exceptions
 from placements.models import PlacementRequest, VisitSchedule, PlacementReport
+from accounts.models import StudentProfile
 from .forms import VisitScheduleForm, BulkActionForm, PlacementFilterForm, ExportForm
 import logging
 import csv
@@ -111,6 +112,7 @@ def approve_placement(request, pk):
                 placement_request.status = 'approved_by_tutor'
                 placement_request.approved_by_tutor = request.user
                 placement_request.tutor_approved_at = timezone.now()
+                placement_request.tutor_comments = comments
                 placement_request.save()
                 
                 logger.info(f"Placement approved by tutor {request.user.username}: {pk}")
@@ -118,6 +120,7 @@ def approve_placement(request, pk):
                 
             elif action == 'reject':
                 placement_request.status = 'rejected'
+                placement_request.tutor_comments = comments
                 placement_request.save()
                 
                 logger.info(f"Placement rejected by tutor {request.user.username}: {pk}")
@@ -317,6 +320,40 @@ def schedule_visit(request, pk):
         'placement_request': placement_request,
     }
     return render(request, 'tutors/schedule_visit.html', context)
+
+@tutor_required
+@handle_exceptions
+def view_student(request, pk):
+    """View detailed student information for tutors"""
+    student = get_object_or_404(
+        StudentProfile.objects.select_related('user', 'course', 'tutor__user'), 
+        pk=pk
+    )
+    
+    # Get placement requests for this student that this tutor has approved
+    placement_requests = PlacementRequest.objects.filter(
+        student=student,
+        approved_by_tutor=request.user
+    ).order_by('-created_at')
+    
+    # Get all placement requests for this student (for context)
+    all_placements = PlacementRequest.objects.filter(
+        student=student
+    ).order_by('-created_at')
+    
+    # Get visit schedules for this student's placements
+    visit_schedules = VisitSchedule.objects.filter(
+        placement_request__student=student,
+        tutor=request.user
+    ).order_by('-visit_date')
+    
+    context = {
+        'student': student,
+        'placement_requests': placement_requests,
+        'all_placements': all_placements,
+        'visit_schedules': visit_schedules,
+    }
+    return render(request, 'tutors/view_student.html', context)
 
 @tutor_required
 @handle_exceptions

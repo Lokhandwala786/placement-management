@@ -21,12 +21,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'core',  # Core app for utilities and views
-    'accounts',  # User authentication and profiles
-    'placements',  # Placement management
-    'students',  # Student-specific functionality
-    'tutors',  # Tutor-specific functionality
-    'providers',  # Provider-specific functionality
+    'core',  
+    'accounts',  
+    'placements', 
+    'students',  
+    'tutors',  
+    'providers', 
 ]
 
 MIDDLEWARE = [
@@ -37,7 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.UserTypeMiddleware',  # Custom middleware for user type handling
+    'core.middleware.UserTypeMiddleware', 
 ]
 
 ROOT_URLCONF = 'placement_management.urls'
@@ -61,7 +61,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'placement_management.wsgi.application'
 
-# Database - Using SQLite for development (will be changed to MySQL later)
+# Database - Using SQLite for development 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -110,14 +110,14 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Email settings (for future email notifications)
+# Email settings 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'irrulokhandwala313@gmail.com'  # <-- Replace with your Gmail address
-EMAIL_HOST_PASSWORD = 'ikqs epga dwhh qych'       # <-- Your Gmail app password
-DEFAULT_FROM_EMAIL = 'irrujobs@gmail.com'  # <-- Replace with your Gmail address
+EMAIL_HOST_USER = 'irrulokhandwala313@gmail.com'
+EMAIL_HOST_PASSWORD = 'ikqs epga dwhh qych'       #  Gmail app password
+DEFAULT_FROM_EMAIL = 'irrujobs@gmail.com'  
 
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB

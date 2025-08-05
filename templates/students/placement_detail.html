@@ -53,6 +53,34 @@
                         </span>
                     </div>
                     
+                    {% if placement_request.provider_comments %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-building me-2"></i>Provider Feedback
+                        </h5>
+                        <div class="alert alert-warning">
+                            <p class="mb-0">{{ placement_request.provider_comments|linebreaks }}</p>
+                            {% if placement_request.provider_approved_at %}
+                            <small class="text-muted">Feedback provided on {{ placement_request.provider_approved_at|date:"M d, Y H:i" }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if placement_request.tutor_comments %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-chalkboard-teacher me-2"></i>Tutor Feedback
+                        </h5>
+                        <div class="alert alert-info">
+                            <p class="mb-0">{{ placement_request.tutor_comments|linebreaks }}</p>
+                            {% if placement_request.tutor_approved_at %}
+                            <small class="text-muted">Feedback provided on {{ placement_request.tutor_approved_at|date:"M d, Y H:i" }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
                     {% if placement_request.status == 'approved_by_tutor' and can_submit_report %}
                     <div class="alert alert-success">
                         <h6><i class="fas fa-check-circle me-2"></i>Placement Approved!</h6>
