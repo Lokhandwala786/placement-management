@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Details - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-custom animate__animated animate__fadeInUp">
+                <div class="card-header bg-gradient-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>Student Details
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Personal Information Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Full Name</dt>
+                                        <dd class="col-sm-7">{{ student.user.get_full_name }}</dd>
+                                        
+                                        <dt class="col-sm-5">Username</dt>
+                                        <dd class="col-sm-7">{{ student.user.username }}</dd>
+                                        
+                                        <dt class="col-sm-5">Email Address</dt>
+                                        <dd class="col-sm-7">{{ student.user.email }}</dd>
+                                        
+                                        <dt class="col-sm-5">Phone Number</dt>
+                                        <dd class="col-sm-7">{{ student.phone|default:'Not provided' }}</dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Student ID</dt>
+                                        <dd class="col-sm-7">{{ student.student_id }}</dd>
+                                        
+                                        <dt class="col-sm-5">Address</dt>
+                                        <dd class="col-sm-7">{{ student.address|default:'Not provided' }}</dd>
+                                        
+                                        <dt class="col-sm-5">Account Status</dt>
+                                        <dd class="col-sm-7">
+                                            {% if student.user.is_verified %}
+                                                <span class="badge bg-success">Verified</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Pending Verification</span>
+                                            {% endif %}
+                                        </dd>
+                                        
+                                        <dt class="col-sm-5">Member Since</dt>
+                                        <dd class="col-sm-7">{{ student.user.created_at|date:"M d, Y" }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-graduation-cap me-2"></i>Academic Information
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">Course</dt>
+                                        <dd class="col-sm-7">{{ student.course.name }} ({{ student.course.code }})</dd>
+                                        
+                                        <dt class="col-sm-5">Course Duration</dt>
+                                        <dd class="col-sm-7">{{ student.course.duration_years }} Years</dd>
+                                        
+                                        <dt class="col-sm-5">Current Year</dt>
+                                        <dd class="col-sm-7">{{ student.get_year_display }}</dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">CGPA</dt>
+                                        <dd class="col-sm-7">
+                                            {% if student.cgpa %}
+                                                {{ student.cgpa }}/10
+                                            {% else %}
+                                                Not provided
+                                            {% endif %}
+                                        </dd>
+                                        
+                                        <dt class="col-sm-5">Assigned Tutor</dt>
+                                        <dd class="col-sm-7">
+                                            {% if student.tutor %}
+                                                {{ student.tutor.user.get_full_name }} ({{ student.tutor.employee_id }})
+                                            {% else %}
+                                                Not assigned
+                                            {% endif %}
+                                        </dd>
+                                        
+                                        <dt class="col-sm-5">Course Description</dt>
+                                        <dd class="col-sm-7">{{ student.course.description|default:'No description available' }}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information Section -->
+                    {% if student.other_info %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Additional Information
+                            </h5>
+                            <div class="alert alert-light">
+                                {{ student.other_info }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Resume Section -->
+                    {% if student.resume %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-file-alt me-2"></i>Resume
+                            </h5>
+                            <a href="{{ student.resume.url }}" class="btn btn-outline-primary" target="_blank">
+                                <i class="fas fa-download me-2"></i>Download Resume
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Placement History Section -->
+                    {% if all_placements %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-briefcase me-2"></i>Placement History
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Job Title</th>
+                                            <th>Company</th>
+                                            <th>Status</th>
+                                            <th>Applied Date</th>
+                                            <th>Last Updated</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for placement in all_placements %}
+                                        <tr>
+                                            <td><strong>{{ placement.job_title }}</strong></td>
+                                            <td>{{ placement.company_name }}</td>
+                                            <td>
+                                                {% if placement.status == 'pending' %}
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                {% elif placement.status == 'approved_by_provider' %}
+                                                    <span class="badge bg-info">Approved by Provider</span>
+                                                {% elif placement.status == 'approved_by_tutor' %}
+                                                    <span class="badge bg-success">Approved by Tutor</span>
+                                                {% elif placement.status == 'rejected' %}
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                {% elif placement.status == 'completed' %}
+                                                    <span class="badge bg-primary">Completed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ placement.created_at|date:"M d, Y" }}</td>
+                                            <td>{{ placement.updated_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'tutors:placement_detail' placement.pk %}" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Visit Schedules Section -->
+                    {% if visit_schedules %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-calendar-check me-2"></i>Visit Schedules
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Visit Date</th>
+                                            <th>Company</th>
+                                            <th>Purpose</th>
+                                            <th>Status</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for visit in visit_schedules %}
+                                        <tr>
+                                            <td>{{ visit.visit_date|date:"M d, Y H:i" }}</td>
+                                            <td>{{ visit.placement_request.company_name }}</td>
+                                            <td>{{ visit.purpose }}</td>
+                                            <td>
+                                                {% if visit.completed %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Scheduled</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ visit.notes|default:'-' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-12 text-center">
+                            <a href="javascript:history.back()" class="btn btn-secondary me-2">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                            {% if student.resume %}
+                            <a href="{{ student.resume.url }}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-eye me-2"></i>View Resume
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'tutors:placement_records' %}?student={{ student.pk }}" class="btn btn-info">
+                                <i class="fas fa-list me-2"></i>View All Placements
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

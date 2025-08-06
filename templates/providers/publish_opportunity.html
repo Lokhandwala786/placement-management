@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Publish Opportunity - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-custom animate__animated animate__fadeInUp">
+                <div class="card-header text-center bg-gradient-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bullhorn me-2"></i>Publish Opportunity
+                    </h4>
+                    <p class="mb-0 mt-2 opacity-75">Fill the details below to publish a new opportunity</p>
+                </div>
+                <div class="card-body">
+                    <!-- Stepper/Progress Bar -->
+                    <div id="stepper" class="mb-4">
+                        <div class="progress" style="height: 8px;">
+                            <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 25%;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-primary text-white"><i class="fas fa-info-circle"></i></span><br>
+                                <small>Basic Details</small>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-secondary text-white"><i class="fas fa-briefcase"></i></span><br>
+                                <small>Job Details</small>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-secondary text-white"><i class="fas fa-calendar-alt"></i></span><br>
+                                <small>Dates & Deadlines</small>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-secondary text-white"><i class="fas fa-check"></i></span><br>
+                                <small>Review & Publish</small>
+                            </div>
+                        </div>
+                        <div class="text-end mt-1">
+                            <small id="progress-text">Step 1 of 4 (25%)</small>
+                        </div>
+                    </div>
+                    <!-- Multi-step Form -->
+                    <form id="opportunity-form" method="post" novalidate>
+                        {% csrf_token %}
+                        <!-- Step 1: Basic Details -->
+                        <div class="step" id="step-1">
+                            {% for field in form.visible_fields %}
+                                {% if field.name == 'title' or field.name == 'location' or field.name == 'type' %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!-- Step 2: Job Details -->
+                        <div class="step d-none" id="step-2">
+                            {% for field in form.visible_fields %}
+                                {% if field.name == 'description' or field.name == 'stipend_salary' or field.name == 'duration' or field.name == 'number_of_openings' or field.name == 'eligibility' or field.name == 'contact_email' %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!-- Step 3: Dates & Deadlines -->
+                        <div class="step d-none" id="step-3">
+                            {% for field in form.visible_fields %}
+                                {% if field.name == 'application_deadline' or field.name == 'start_date' %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in field.errors %}
+                                            <div class="invalid-feedback d-block">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <!-- Step 4: Review & Publish -->
+                        <div class="step d-none" id="step-4">
+                            <div class="mb-3">
+                                <h5>Review Your Opportunity</h5>
+                                <div id="review-summary" class="card border-primary mb-3">
+                                    <div class="card-header bg-primary text-white">
+                                        <i class="fas fa-eye me-1"></i>Summary
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item"><strong>Title:</strong> <span id="review-title"></span></li>
+                                            <li class="list-group-item"><strong>Location:</strong> <span id="review-location"></span></li>
+                                            <li class="list-group-item"><strong>Type:</strong> <span id="review-type"></span></li>
+                                            <li class="list-group-item"><strong>Description:</strong><div class="border rounded p-2 mt-1 bg-light" id="review-description" style="white-space: pre-line;"></div></li>
+                                            <li class="list-group-item"><strong>Stipend/Salary:</strong> <span id="review-stipend_salary"></span></li>
+                                            <li class="list-group-item"><strong>Duration:</strong> <span id="review-duration"></span></li>
+                                            <li class="list-group-item"><strong>Number of Openings:</strong> <span id="review-number_of_openings"></span></li>
+                                            <li class="list-group-item"><strong>Eligibility:</strong><div class="border rounded p-2 mt-1 bg-light" id="review-eligibility" style="white-space: pre-line;"></div></li>
+                                            <li class="list-group-item"><strong>Contact Email:</strong> <span id="review-contact_email"></span></li>
+                                            <li class="list-group-item"><strong>Application Deadline:</strong> <span id="review-application_deadline"></span></li>
+                                            <li class="list-group-item"><strong>Start Date:</strong> <span id="review-start_date"></span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-secondary" id="prevBtn" onclick="nextPrev(-1)" disabled>Previous</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+                            <button type="submit" class="btn btn-success d-none" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Publish Opportunity
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light">
+                    <a href="{% url 'providers:dashboard' %}" class="btn btn-link">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.step-icon {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+.step-icon.bg-primary { background: #0d6efd; }
+.step-icon.bg-secondary { background: #6c757d; }
+.step-icon.completed { background: #198754 !important; }
+</style>
+
+<script>
+let currentStep = 1;
+const totalSteps = 4;
+
+function showStep(step) {
+    document.querySelectorAll('.step').forEach((el) => {
+        el.classList.add('d-none');
+    });
+    document.getElementById('step-' + step).classList.remove('d-none');
+    const icons = document.querySelectorAll('.step-icon');
+    icons.forEach((icon, idx) => {
+        if (idx + 1 < step) {
+            icon.classList.remove('bg-primary', 'bg-secondary');
+            icon.classList.add('completed');
+        } else if (idx + 1 === step) {
+            icon.classList.remove('bg-secondary', 'completed');
+            icon.classList.add('bg-primary');
+        } else {
+            icon.classList.remove('bg-primary', 'completed');
+            icon.classList.add('bg-secondary');
+        }
+    });
+    const percent = Math.round((step / totalSteps) * 100);
+    document.getElementById('progress-bar').style.width = percent + '%';
+    document.getElementById('progress-text').innerText = `Step ${step} of ${totalSteps} (${percent}%)`;
+    document.getElementById('prevBtn').disabled = (step === 1);
+    document.getElementById('nextBtn').classList.toggle('d-none', step === totalSteps);
+    document.getElementById('submitBtn').classList.toggle('d-none', step !== totalSteps);
+    if (step === totalSteps) fillReviewSummary();
+}
+function nextPrev(n) {
+    if (n === 1 && !validateStep(currentStep)) return false;
+    currentStep += n;
+    if (currentStep < 1) currentStep = 1;
+    if (currentStep > totalSteps) currentStep = totalSteps;
+    showStep(currentStep);
+}
+function validateStep(step) {
+    const stepDiv = document.getElementById('step-' + step);
+    let valid = true;
+    stepDiv.querySelectorAll('input, select, textarea').forEach(input => {
+        if (!input.checkValidity()) {
+            input.classList.add('is-invalid');
+            valid = false;
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    });
+    return valid;
+}
+function fillReviewSummary() {
+    function getFieldValue(name) {
+        const el = document.getElementsByName(name)[0];
+        if (!el) return '';
+        if (el.tagName === 'SELECT') return el.selectedOptions[0]?.text || '';
+        return el.value;
+    }
+    document.getElementById('review-title').innerText = getFieldValue('title');
+    document.getElementById('review-location').innerText = getFieldValue('location');
+    document.getElementById('review-type').innerText = getFieldValue('type');
+    document.getElementById('review-description').innerText = getFieldValue('description');
+    document.getElementById('review-stipend_salary').innerText = getFieldValue('stipend_salary');
+    document.getElementById('review-duration').innerText = getFieldValue('duration');
+    document.getElementById('review-number_of_openings').innerText = getFieldValue('number_of_openings');
+    document.getElementById('review-eligibility').innerText = getFieldValue('eligibility');
+    document.getElementById('review-contact_email').innerText = getFieldValue('contact_email');
+    document.getElementById('review-application_deadline').innerText = getFieldValue('application_deadline');
+    document.getElementById('review-start_date').innerText = getFieldValue('start_date');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    showStep(currentStep);
+});
+</script>
+{% endblock %} 

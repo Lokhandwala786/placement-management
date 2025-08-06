@@ -1,0 +1,52 @@
+{% extends 'index.html' %}
+
+{% block title %}Opportunity Details - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-custom">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>{{ opportunity.title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Provider</dt>
+                        <dd class="col-sm-8">{{ opportunity.provider.user.get_full_name }}</dd>
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">{{ opportunity.location }}</dd>
+                        <dt class="col-sm-4">Type</dt>
+                        <dd class="col-sm-8">{{ opportunity.get_type_display }}</dd>
+                        <dt class="col-sm-4">Stipend/Salary</dt>
+                        <dd class="col-sm-8">{{ opportunity.stipend_salary }}</dd>
+                        <dt class="col-sm-4">Deadline</dt>
+                        <dd class="col-sm-8">{{ opportunity.application_deadline|date:'M d, Y' }}</dd>
+                        <dt class="col-sm-4">Number of Openings</dt>
+                        <dd class="col-sm-8">{{ opportunity.number_of_openings }}</dd>
+                        <dt class="col-sm-4">Contact Email</dt>
+                        <dd class="col-sm-8">{{ opportunity.contact_email }}</dd>
+                        <dt class="col-sm-4">Eligibility</dt>
+                        <dd class="col-sm-8">{{ opportunity.eligibility|default:'-' }}</dd>
+                        <dt class="col-sm-4">Description</dt>
+                        <dd class="col-sm-8"><div class="border rounded p-2 bg-light">{{ opportunity.description|linebreaks }}</div></dd>
+                    </dl>
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{% url 'students:opportunity_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Opportunities
+                    </a>
+                    <form method="post" action="{% url 'students:apply_opportunity' opportunity.id %}" style="display:inline-block;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success ms-2">
+                            <i class="fas fa-paper-plane me-1"></i>Apply
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

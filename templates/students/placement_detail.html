@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Details - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-custom">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>Placement Details
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Company Information</h5>
+                            <p><strong>Company:</strong> {{ placement_request.company_name }}</p>
+                            <p><strong>Job Title:</strong> {{ placement_request.job_title }}</p>
+                            <p><strong>Location:</strong> {{ placement_request.location }}</p>
+                            <p><strong>Provider:</strong> {{ placement_request.provider.company_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-primary">Timeline</h5>
+                            <p><strong>Start Date:</strong> {{ placement_request.start_date }}</p>
+                            <p><strong>End Date:</strong> {{ placement_request.end_date }}</p>
+                            <p><strong>Duration:</strong> {{ placement_request.start_date|timesince:placement_request.end_date }}</p>
+                            <p><strong>Created:</strong> {{ placement_request.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary">Job Description</h5>
+                        <p>{{ placement_request.job_description|linebreaks }}</p>
+                    </div>
+                    
+                    {% if placement_request.documents %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">Documents</h5>
+                        <a href="{{ placement_request.documents.url }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-download me-2"></i>Download Documents
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-4">
+                        <h5 class="text-primary">Status</h5>
+                        <span class="badge bg-{% if placement_request.status == 'pending' %}warning{% elif placement_request.status == 'approved_by_provider' %}info{% elif placement_request.status == 'approved_by_tutor' %}success{% elif placement_request.status == 'rejected' %}danger{% else %}secondary{% endif %} fs-6">
+                            {{ placement_request.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    {% if placement_request.provider_comments %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-building me-2"></i>Provider Feedback
+                        </h5>
+                        <div class="alert alert-warning">
+                            <p class="mb-0">{{ placement_request.provider_comments|linebreaks }}</p>
+                            {% if placement_request.provider_approved_at %}
+                            <small class="text-muted">Feedback provided on {{ placement_request.provider_approved_at|date:"M d, Y H:i" }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if placement_request.tutor_comments %}
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-chalkboard-teacher me-2"></i>Tutor Feedback
+                        </h5>
+                        <div class="alert alert-info">
+                            <p class="mb-0">{{ placement_request.tutor_comments|linebreaks }}</p>
+                            {% if placement_request.tutor_approved_at %}
+                            <small class="text-muted">Feedback provided on {{ placement_request.tutor_approved_at|date:"M d, Y H:i" }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if placement_request.status == 'approved_by_tutor' and can_submit_report %}
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle me-2"></i>Placement Approved!</h6>
+                        <p class="mb-2">Your placement has been approved. You can now submit your placement report.</p>
+                        <a href="{% url 'students:submit_report' placement_request.pk %}" class="btn btn-success">
+                            <i class="fas fa-file-alt me-2"></i>Submit Report
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if reports %}
+            <div class="card shadow-custom mt-4">
+                <div class="card-header bg-gradient-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Placement Reports
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for report in reports %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">Report #{{ forloop.counter }}</h6>
+                                <p class="text-muted mb-2">Submitted: {{ report.submitted_at|date:"M d, Y H:i" }}</p>
+                                {% if report.comments %}
+                                <p class="mb-2"><strong>Comments:</strong> {{ report.comments }}</p>
+                                {% endif %}
+                            </div>
+                            <a href="{{ report.report_file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-download me-1"></i>Download
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-custom">
+                <div class="card-header bg-gradient-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'students:dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                        </a>
+                        <a href="{% url 'students:create_request' %}" class="btn btn-outline-success">
+                            <i class="fas fa-plus me-2"></i>Create New Request
+                        </a>
+                        {% if placement_request.status == 'pending' %}
+                        <a href="#" class="btn btn-outline-warning">
+                            <i class="fas fa-edit me-2"></i>Edit Request
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
