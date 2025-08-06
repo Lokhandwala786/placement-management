@@ -33,12 +33,15 @@
                                 <td>{{ opp.stipend_salary }}</td>
                                 <td>{{ opp.application_deadline|date:'M d, Y' }}</td>
                                 <td>
-                                    <form method="post" action="{% url 'students:apply_opportunity' opp.id %}">
+                                    <form method="post" action="{% url 'students:apply_opportunity' opp.id %}" style="display:inline-block;">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-success btn-sm">
                                             <i class="fas fa-paper-plane me-1"></i>Apply
                                         </button>
                                     </form>
+                                    <a href="{% url 'students:opportunity_detail' opp.id %}" class="btn btn-primary btn-sm ms-1">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -58,4 +61,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

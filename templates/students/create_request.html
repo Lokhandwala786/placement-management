@@ -14,148 +14,216 @@
                     <p class="mb-0 mt-2 opacity-75">Submit your placement application</p>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+
+                    <!-- Stepper/Progress Bar -->
+                    <div id="stepper" class="mb-4">
+                        <div class="progress" style="height: 8px;">
+                            <div id="progress-bar" class="progress-bar bg-primary" role="progressbar" style="width: 25%;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-primary text-white"><i class="fas fa-building"></i></span><br>
+                                <small>Select Provider & Tutor</small>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-secondary text-white"><i class="fas fa-briefcase"></i></span><br>
+                                <small>Job Details</small>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-secondary text-white"><i class="fas fa-file-alt"></i></span><br>
+                                <small>Description & Docs</small>
+                            </div>
+                            <div class="text-center flex-fill">
+                                <span class="step-icon bg-secondary text-white"><i class="fas fa-check"></i></span><br>
+                                <small>Review & Submit</small>
+                            </div>
+                        </div>
+                        <div class="text-end mt-1">
+                            <small id="progress-text">Step 1 of 4 (25%)</small>
+                        </div>
+                    </div>
+                    <!-- Multi-step Form -->
+                    <form id="placement-form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.provider.id_for_label }}" class="form-label">
-                                    <i class="fas fa-building me-1"></i>Placement Provider *
+                        <!-- Step 1: Provider & Tutor -->
+                        <div class="step" id="step-1">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.provider.id_for_label }}" class="form-label">
+                                        <i class="fas fa-building me-1"></i>Placement Provider *
+                                    </label>
+                                    {{ form.provider }}
+                                    {% if form.provider.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.provider.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div id="provider-details" class="mt-2" style="display: none;">
+                                        <div class="alert alert-info">
+                                            <small>
+                                                <strong>Provider Details:</strong><br>
+                                                <span id="provider-company"></span><br>
+                                                <span id="provider-contact"></span><br>
+                                                <span id="provider-email"></span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.tutor.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user-tie me-1"></i>Choose Your Tutor *
+                                    </label>
+                                    {{ form.tutor }}
+                                    {% if form.tutor.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.tutor.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Step 2: Job Details -->
+                        <div class="step d-none" id="step-2">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.company_name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-building me-1"></i>Company Name *
+                                    </label>
+                                    {{ form.company_name }}
+                                    {% if form.company_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.company_name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.job_title.id_for_label }}" class="form-label">
+                                        <i class="fas fa-briefcase me-1"></i>Job Title *
+                                    </label>
+                                    {{ form.job_title }}
+                                    {% if form.job_title.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.job_title.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.location.id_for_label }}" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Work Location *
+                                    </label>
+                                    {{ form.location }}
+                                    {% if form.location.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.location.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.start_date.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar me-1"></i>Start Date *
+                                    </label>
+                                    {{ form.start_date }}
+                                    {% if form.start_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.start_date.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Date must be in the future</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.end_date.id_for_label }}" class="form-label">
+                                        <i class="fas fa-calendar me-1"></i>End Date *
+                                    </label>
+                                    {{ form.end_date }}
+                                    {% if form.end_date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.end_date.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">Date must be in the future</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Step 3: Description & Documents -->
+                        <div class="step d-none" id="step-3">
+                            <div class="mb-3">
+                                <label for="{{ form.job_description.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt me-1"></i>Job Description *
                                 </label>
-                                {{ form.provider }}
-                                {% if form.provider.errors %}
+                                {{ form.job_description }}
+                                {% if form.job_description.errors %}
                                     <div class="invalid-feedback d-block">
-                                        {{ form.provider.errors.0 }}
+                                        {{ form.job_description.errors.0 }}
                                     </div>
                                 {% endif %}
-                                <div id="provider-details" class="mt-2" style="display: none;">
-                                    <div class="alert alert-info">
-                                        <small>
-                                            <strong>Provider Details:</strong><br>
-                                            <span id="provider-company"></span><br>
-                                            <span id="provider-contact"></span><br>
-                                            <span id="provider-email"></span>
-                                        </small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.documents.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-upload me-1"></i>Supporting Documents (Optional)
+                                </label>
+                                {{ form.documents }}
+                                <div class="form-text">Upload your resume, cover letter, or other relevant documents (PDF, DOC, DOCX)</div>
+                                {% if form.documents.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.documents.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Step 4: Review & Submit -->
+                        <div class="step d-none" id="step-4">
+                            <div class="mb-3">
+                                <h5>Review Your Placement Request</h5>
+                                <div id="review-summary" class="card border-primary mb-3">
+                                    <div class="card-header bg-primary text-white">
+                                        <i class="fas fa-eye me-1"></i>Summary
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <strong>Provider:</strong> <span id="review-provider"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Tutor:</strong> <span id="review-tutor"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Company Name:</strong> <span id="review-company"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Job Title:</strong> <span id="review-jobtitle"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Location:</strong> <span id="review-location"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Start Date:</strong> <span id="review-startdate"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>End Date:</strong> <span id="review-enddate"></span>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Job Description:</strong>
+                                                <div class="border rounded p-2 mt-1 bg-light" id="review-description" style="white-space: pre-line;"></div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <strong>Documents:</strong> <span id="review-docs"></span>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.tutor.id_for_label }}" class="form-label">
-                                    <i class="fas fa-user-tie me-1"></i>Choose Your Tutor *
-                                </label>
-                                {{ form.tutor }}
-                                {% if form.tutor.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.tutor.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.company_name.id_for_label }}" class="form-label">
-                                    <i class="fas fa-building me-1"></i>Company Name *
-                                </label>
-                                {{ form.company_name }}
-                                {% if form.company_name.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.company_name.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.job_title.id_for_label }}" class="form-label">
-                                    <i class="fas fa-briefcase me-1"></i>Job Title *
-                                </label>
-                                {{ form.job_title }}
-                                {% if form.job_title.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.job_title.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.location.id_for_label }}" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-1"></i>Work Location *
-                                </label>
-                                {{ form.location }}
-                                {% if form.location.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.location.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.start_date.id_for_label }}" class="form-label">
-                                    <i class="fas fa-calendar me-1"></i>Start Date *
-                                </label>
-                                {{ form.start_date }}
-                                {% if form.start_date.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.start_date.errors.0 }}
-                                    </div>
-                                {% endif %}
-                                <div class="form-text">Date must be in the future</div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.end_date.id_for_label }}" class="form-label">
-                                    <i class="fas fa-calendar me-1"></i>End Date *
-                                </label>
-                                {{ form.end_date }}
-                                {% if form.end_date.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.end_date.errors.0 }}
-                                    </div>
-                                {% endif %}
-                                <div class="form-text">Date must be in the future</div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.job_description.id_for_label }}" class="form-label">
-                                <i class="fas fa-file-alt me-1"></i>Job Description *
-                            </label>
-                            {{ form.job_description }}
-                            {% if form.job_description.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.job_description.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.documents.id_for_label }}" class="form-label">
-                                <i class="fas fa-file-upload me-1"></i>Supporting Documents (Optional)
-                            </label>
-                            {{ form.documents }}
-                            <div class="form-text">Upload your resume, cover letter, or other relevant documents (PDF, DOC, DOCX)</div>
-                            {% if form.documents.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.documents.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-secondary" id="prevBtn" onclick="nextPrev(-1)" disabled>Previous</button>
+                            <button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+                            <button type="submit" class="btn btn-success d-none" id="submitBtn">
                                 <i class="fas fa-paper-plane me-2"></i>Submit Placement Request
                             </button>
-                        </div>
-                        
-                        <div class="text-center">
-                            <small class="text-muted">
-                                Your request will be reviewed by the placement provider and then by your tutor.
-                            </small>
                         </div>
                     </form>
                 </div>
@@ -169,15 +237,104 @@
     </div>
 </div>
 
+<style>
+.step-icon {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 50%;
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+.step-icon.bg-primary { background: #0d6efd; }
+.step-icon.bg-secondary { background: #6c757d; }
+.step-icon.completed { background: #198754 !important; }
+</style>
+
 <script>
+let currentStep = 1;
+const totalSteps = 4;
+
+function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.step').forEach((el, idx) => {
+        el.classList.add('d-none');
+    });
+    // Show current step
+    document.getElementById('step-' + step).classList.remove('d-none');
+    // Update stepper icons
+    const icons = document.querySelectorAll('.step-icon');
+    icons.forEach((icon, idx) => {
+        if (idx + 1 < step) {
+            icon.classList.remove('bg-primary', 'bg-secondary');
+            icon.classList.add('completed');
+        } else if (idx + 1 === step) {
+            icon.classList.remove('bg-secondary', 'completed');
+            icon.classList.add('bg-primary');
+        } else {
+            icon.classList.remove('bg-primary', 'completed');
+            icon.classList.add('bg-secondary');
+        }
+    });
+    // Update progress bar
+    const percent = Math.round((step / totalSteps) * 100);
+    document.getElementById('progress-bar').style.width = percent + '%';
+    document.getElementById('progress-text').innerText = `Step ${step} of ${totalSteps} (${percent}%)`;
+    // Update buttons
+    document.getElementById('prevBtn').disabled = (step === 1);
+    document.getElementById('nextBtn').classList.toggle('d-none', step === totalSteps);
+    document.getElementById('submitBtn').classList.toggle('d-none', step !== totalSteps);
+    // Fill review summary on last step
+    if (step === totalSteps) fillReviewSummary();
+}
+function nextPrev(n) {
+    if (n === 1 && !validateStep(currentStep)) return false;
+    currentStep += n;
+    if (currentStep < 1) currentStep = 1;
+    if (currentStep > totalSteps) currentStep = totalSteps;
+    showStep(currentStep);
+}
+function validateStep(step) {
+    // Basic HTML5 validation for current step
+    const stepDiv = document.getElementById('step-' + step);
+    let valid = true;
+    stepDiv.querySelectorAll('input, select, textarea').forEach(input => {
+        if (!input.checkValidity()) {
+            input.classList.add('is-invalid');
+            valid = false;
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    });
+    return valid;
+}
+function fillReviewSummary() {
+    // Fill review summary with entered data in a structured way
+    document.getElementById('review-provider').innerText = document.getElementById('{{ form.provider.id_for_label }}').selectedOptions[0]?.text || '';
+    document.getElementById('review-tutor').innerText = document.getElementById('{{ form.tutor.id_for_label }}').selectedOptions[0]?.text || '';
+    document.getElementById('review-company').innerText = document.getElementById('{{ form.company_name.id_for_label }}').value;
+    document.getElementById('review-jobtitle').innerText = document.getElementById('{{ form.job_title.id_for_label }}').value;
+    document.getElementById('review-location').innerText = document.getElementById('{{ form.location.id_for_label }}').value;
+    document.getElementById('review-startdate').innerText = document.getElementById('{{ form.start_date.id_for_label }}').value;
+    document.getElementById('review-enddate').innerText = document.getElementById('{{ form.end_date.id_for_label }}').value;
+    document.getElementById('review-description').innerText = document.getElementById('{{ form.job_description.id_for_label }}').value;
+    // Documents: just show file name if selected
+    const docs = document.getElementById('{{ form.documents.id_for_label }}');
+    if (docs && docs.files.length > 0) {
+        document.getElementById('review-docs').innerText = docs.files[0].name;
+    } else {
+        document.getElementById('review-docs').innerText = 'No document uploaded';
+    }
+}
 document.addEventListener('DOMContentLoaded', function() {
+    showStep(currentStep);
+    // Provider details logic (existing)
     const providerSelect = document.getElementById('{{ form.provider.id_for_label }}');
     const providerDetails = document.getElementById('provider-details');
     const providerCompany = document.getElementById('provider-company');
     const providerContact = document.getElementById('provider-contact');
     const providerEmail = document.getElementById('provider-email');
-    
-    // Provider details data (you can make this dynamic via AJAX if needed)
     const providerData = {
         {% for provider in form.provider.queryset %}
         '{{ provider.pk }}': {
@@ -190,7 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {% endfor %}
     };
-    
     function updateProviderDetails() {
         const selectedValue = providerSelect.value;
         if (selectedValue && providerData[selectedValue]) {
@@ -203,14 +359,8 @@ document.addEventListener('DOMContentLoaded', function() {
             providerDetails.style.display = 'none';
         }
     }
-    
     providerSelect.addEventListener('change', updateProviderDetails);
-    
-    // Show details if provider is pre-selected (e.g., on form errors)
-    if (providerSelect.value) {
-        updateProviderDetails();
-    }
-    });
+    updateProviderDetails();
     
     // Set minimum date for date inputs to today
     const today = new Date().toISOString().split('T')[0];
@@ -253,4 +403,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-{% endblock %} 
+{% endblock %}

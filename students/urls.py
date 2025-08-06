@@ -10,4 +10,5 @@ urlpatterns = [
     path('submit-report/<int:pk>/', views.submit_report, name='submit_report'),
     path('opportunities/', views.opportunity_list, name='opportunity_list'),
     path('opportunities/apply/<int:opportunity_id>/', views.apply_opportunity, name='apply_opportunity'),
+    path('opportunity/<int:pk>/', views.opportunity_detail, name='opportunity_detail'),
 ]

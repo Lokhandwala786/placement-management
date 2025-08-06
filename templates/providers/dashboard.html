@@ -78,7 +78,6 @@
                                     <th>Job Title</th>
                                     <th>Type</th>
                                     <th>Location</th>
-                                    <th>Status</th>
                                     <th>Deadline</th>
                                     <th>Applications</th>
                                     <th>Published</th>
@@ -96,15 +95,6 @@
                                         <span class="badge bg-info">{{ opp.get_type_display }}</span>
                                     </td>
                                     <td>{{ opp.location }}</td>
-                                    <td>
-                                        {% if opp.status == 'pending' %}
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        {% elif opp.status == 'approved' %}
-                                            <span class="badge bg-success">Approved</span>
-                                        {% elif opp.status == 'rejected' %}
-                                            <span class="badge bg-danger">Rejected</span>
-                                        {% endif %}
-                                    </td>
                                     <td>
                                         {% if opp.application_deadline %}
                                             <span class="{% if opp.application_deadline < today %}text-danger{% endif %}">
@@ -289,4 +279,4 @@
     </div>
 </div>
 {% endfor %}
-{% endblock %} 
+{% endblock %}

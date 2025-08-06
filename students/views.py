@@ -131,6 +131,13 @@ def opportunity_list(request):
 
 @student_required
 @handle_exceptions
+def opportunity_detail(request, pk):
+    """Show details of a single opportunity to the student."""
+    opportunity = get_object_or_404(PublishOpportunity, pk=pk, status='approved')
+    return render(request, 'students/opportunity_detail.html', {'opportunity': opportunity})
+
+@student_required
+@handle_exceptions
 def apply_opportunity(request, opportunity_id):
     """Handle student applying to an opportunity."""
     opportunity = get_object_or_404(PublishOpportunity, pk=opportunity_id, status='approved')
