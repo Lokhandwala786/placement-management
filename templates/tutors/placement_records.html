@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Records - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-list-alt me-2"></i>Placement Records
+                    </h2>
+                    <p class="text-muted mb-0">View and manage all approved placements</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'tutors:export_placements' %}" class="btn btn-success">
+                        <i class="fas fa-download me-2"></i>Export Data
+                    </a>
+                </div>
+            </div>
+
+            <!-- Placements List -->
+            {% if placements %}
+                <div class="row">
+                    {% for placement in placements %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-{{ placement.status|yesno:'success,warning,info' }}">
+                                        {{ placement.get_status_display }}
+                                    </span>
+                                    <small class="text-muted">{{ placement.created_at|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">
+                                    <i class="fas fa-user-graduate me-2"></i>
+                                    {{ placement.student.user.get_full_name }}
+                                </h6>
+                                <p class="card-text text-muted small mb-2">
+                                    <i class="fas fa-building me-1"></i>{{ placement.company_name }}
+                                </p>
+                                <p class="card-text text-muted small mb-2">
+                                    <i class="fas fa-briefcase me-1"></i>{{ placement.job_title }}
+                                </p>
+                                <p class="card-text text-muted small mb-2">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ placement.start_date|date:"M d" }} - {{ placement.end_date|date:"M d, Y" }}
+                                </p>
+                                <p class="card-text text-muted small mb-3">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ placement.location }}
+                                </p>
+                                
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'tutors:placement_detail' pk=placement.pk %}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye me-2"></i>View Details
+                                    </a>
+                                    {% if placement.status == 'approved_by_tutor' %}
+                                    <a href="{% url 'tutors:schedule_visit' pk=placement.pk %}" 
+                                       class="btn btn-info btn-sm">
+                                        <i class="fas fa-calendar-plus me-2"></i>Schedule Visit
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if placements.has_other_pages %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if placements.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ placements.previous_page_number }}">Previous</a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in placements.paginator.page_range %}
+                            {% if placements.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > placements.number|add:'-3' and num < placements.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if placements.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ placements.next_page_number }}">Next</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Placement Records</h4>
+                    <p class="text-muted">No placements have been approved yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

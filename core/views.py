@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from accounts.models import StudentProfile, TutorProfile, ProviderProfile
 from placements.models import PlacementRequest
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -116,3 +117,63 @@ def handler404(request, exception):
 def handler500(request):
     """Custom 500 error handler"""
     return render(request, 'errors/500.html', status=500)
+
+def map_view(request):
+    """Google Maps view showing all placement locations"""
+    try:
+        # Get all placements with location data
+        placements = PlacementRequest.objects.filter(
+            latitude__isnull=False,
+            longitude__isnull=False
+        ).select_related('student__user', 'provider__user', 'student__course')
+        
+        # Group placements by location for clustering
+        locations = {}
+        for placement in placements:
+            location_key = f"{placement.latitude},{placement.longitude}"
+            if location_key not in locations:
+                locations[location_key] = {
+                    'lat': float(placement.latitude),
+                    'lng': float(placement.longitude),
+                    'placements': [],
+                    'company': placement.company_name,
+                    'address': placement.location
+                }
+            locations[location_key]['placements'].append(placement)
+        
+        # Convert to JSON for safe JavaScript rendering
+        locations_list = list(locations.values())
+        for location in locations_list:
+            # Convert placement objects to serializable format
+            location['placements'] = [{
+                'id': p.id,
+                'status': p.status,
+                'student': {
+                    'user': {
+                        'first_name': p.student.user.first_name,
+                        'last_name': p.student.user.last_name
+                    }
+                },
+                'company_name': p.company_name,
+                'job_title': p.job_title,
+                'start_date': p.start_date.isoformat() if p.start_date else None,
+                'end_date': p.end_date.isoformat() if p.end_date else None
+            } for p in location['placements']]
+        
+        context = {
+            'placements': placements,
+            'locations': json.dumps(locations_list),
+            'total_placements': placements.count(),
+            'total_locations': len(locations),
+        }
+        return render(request, 'core/map_view.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in map view: {str(e)}")
+        context = {
+            'placements': [],
+            'locations': json.dumps([]),
+            'total_placements': 0,
+            'total_locations': 0,
+        }
+        return render(request, 'core/map_view.html', context)

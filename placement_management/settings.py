@@ -123,6 +123,10 @@ DEFAULT_FROM_EMAIL = 'irrujobs@gmail.com'
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
+# Google Maps API Configuration
+GOOGLE_MAPS_API_KEY = 'AIzaSyAceDMOH0J32JkbE3NPRII8WyAm-Fmj4lI'  # Replace with your actual API key
+GOOGLE_MAPS_ENABLED = True
+
 # Create required directories
 os.makedirs(BASE_DIR / 'static', exist_ok=True)
 os.makedirs(BASE_DIR / 'media', exist_ok=True)

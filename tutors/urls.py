@@ -14,4 +14,6 @@ urlpatterns = [
     path('export/', views.export_placements, name='export_placements'),
     path('schedule/<int:pk>/', views.schedule_visit, name='schedule_visit'),
     path('calendar/', views.calendar_view, name='calendar'),
+    path('visit/<int:visit_id>/update-date/', views.update_visit_date, name='update_visit_date'),
+    path('visit/<int:visit_id>/mark-completed/', views.mark_visit_completed, name='mark_visit_completed'),
 ]

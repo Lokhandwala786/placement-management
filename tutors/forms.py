@@ -94,40 +94,34 @@ class ExportForm(forms.Form):
     EXPORT_FORMATS = [
         ('excel', 'Excel (.xlsx)'),
         ('csv', 'CSV (.csv)'),
-        ('pdf', 'PDF (.pdf)'),
     ]
     
-    format = forms.ChoiceField(
+    export_format = forms.ChoiceField(
         choices=EXPORT_FORMATS,
+        initial='excel',
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    include_reports = forms.BooleanField(
-        required=False,
-        initial=True,
-        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
-    )
-    date_range = forms.ChoiceField(
-        choices=[
-            ('all', 'All Time'),
-            ('this_month', 'This Month'),
-            ('this_year', 'This Year'),
-            ('custom', 'Custom Range'),
-        ],
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )
-    custom_start_date = forms.DateField(
+    
+    date_from = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={
             'class': 'form-control',
             'type': 'date'
         })
     )
-    custom_end_date = forms.DateField(
+    
+    date_to = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={
             'class': 'form-control',
             'type': 'date'
         })
+    )
+    
+    status = forms.ChoiceField(
+        choices=[('', 'All Statuses')] + list(PlacementRequest.STATUS_CHOICES),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     
     def clean_custom_start_date(self):

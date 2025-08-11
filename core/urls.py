@@ -20,4 +20,7 @@ urlpatterns = [
     path('placement/create/', views.create_placement_request, name='create_placement'),
     path('placement/<int:placement_id>/', views.placement_detail, name='placement_detail'),
     path('placement/<int:placement_id>/approve/', views.approve_placement, name='approve_placement'),
+    
+    # Map View
+    path('map/', views.map_view, name='map_view'),
 ]
