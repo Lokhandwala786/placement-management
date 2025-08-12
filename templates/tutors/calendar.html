@@ -104,7 +104,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-                            <form id="visitForm" method="post">
+            <form id="visitForm" method="post" action="{% url 'tutors:schedule_visit_ajax' %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="row">
@@ -144,7 +144,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="fas fa-save me-2"></i>Schedule Visit
                     </button>
                 </div>
@@ -175,6 +175,10 @@
         </div>
     </div>
 </div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -183,10 +187,22 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
 <script>
+// Global variables
+let calendar;
+let currentEventId;
+
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize FullCalendar
+    initializeCalendar();
+    setupEventListeners();
+    updateStats();
+});
+
+function initializeCalendar() {
     const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
+    
+    // Calendar configuration
+    calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         headerToolbar: {
             left: 'prev,next today',
@@ -199,31 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
         selectMirror: true,
         dayMaxEvents: true,
         weekends: true,
+        locale: 'en-GB',
         
-        // Event sources
-        events: [
-            {% for visit in visits_by_month %}
-                {% for visit in visit.placements %}
-                {
-                    id: '{{ visit.id }}',
-                    title: '{{ visit.purpose }}',
-                    start: '{{ visit.visit_date|date:"Y-m-d\TH:i:s" }}',
-                    end: '{{ visit.visit_date|date:"Y-m-d\TH:i:s" }}',
-                    extendedProps: {
-                        placement: '{{ visit.placement_request.company_name }}',
-                        student: '{{ visit.placement_request.student.user.first_name }} {{ visit.placement_request.student.user.last_name }}',
-                        purpose: '{{ visit.purpose }}',
-                        notes: '{{ visit.notes|default:"" }}',
-                        completed: {{ visit.completed|yesno:"true,false" }},
-                        placementId: '{{ visit.placement_request.id }}'
-                    },
-                    backgroundColor: '{{ visit.completed|yesno:"#28a745,#ffc107" }}',
-                    borderColor: '{{ visit.completed|yesno:"#28a745,#ffc107" }}',
-                    textColor: '{{ visit.completed|yesno:"white,black" }}'
-                }{% if not forloop.last %},{% endif %}
-                {% endfor %}{% if not forloop.last %},{% endif %}
-            {% endfor %}
-        ],
+        // Events data from Django
+        events: {{ visits_data|safe }},
         
         // Event handling
         eventClick: function(info) {
@@ -240,7 +235,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         select: function(info) {
             // Pre-fill date when selecting a date
-            document.getElementById('visit_date').value = info.startStr;
+            const selectedDate = info.startStr;
+            document.getElementById('visit_date').value = selectedDate;
             new bootstrap.Modal(document.getElementById('addVisitModal')).show();
         },
         
@@ -253,19 +249,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 placement: 'top',
                 trigger: 'hover'
             });
+        },
+        
+        // Error handling
+        eventSourceFailure: function(error) {
+            console.error('Calendar event source error:', error);
+            showToast('Failed to load calendar events', 'error');
         }
     });
     
     calendar.render();
-    
-    // Update statistics
-    updateStats();
-    
-    // Setup event listeners
-    setupEventListeners();
-});
+}
 
 function showVisitDetails(event) {
+    currentEventId = event.id;
+    
     const content = `
         <div class="row">
             <div class="col-12">
@@ -319,6 +317,9 @@ function updateVisitDate(event) {
     const newDate = event.start.toISOString();
     const visitId = event.id;
     
+    // Show loading state
+    showToast('Updating visit date...', 'info');
+    
     // Send AJAX request to update visit date
     fetch(`/tutors/visit/${visitId}/update-date/`, {
         method: 'POST',
@@ -335,7 +336,7 @@ function updateVisitDate(event) {
         if (data.success) {
             showToast('Visit date updated successfully!', 'success');
         } else {
-            showToast('Failed to update visit date', 'error');
+            showToast(data.message || 'Failed to update visit date', 'error');
             calendar.refetchEvents(); // Refresh calendar
         }
     })
@@ -347,6 +348,9 @@ function updateVisitDate(event) {
 }
 
 function markVisitCompleted(visitId) {
+    // Show loading state
+    showToast('Marking visit as completed...', 'info');
+    
     fetch(`/tutors/visit/${visitId}/mark-completed/`, {
         method: 'POST',
         headers: {
@@ -362,7 +366,7 @@ function markVisitCompleted(visitId) {
             updateStats();
             bootstrap.Modal.getInstance(document.getElementById('visitDetailsModal')).hide();
         } else {
-            showToast('Failed to mark visit as completed', 'error');
+            showToast(data.message || 'Failed to mark visit as completed', 'error');
         }
     })
     .catch(error => {
@@ -372,6 +376,8 @@ function markVisitCompleted(visitId) {
 }
 
 function updateStats() {
+    if (!calendar) return;
+    
     const events = calendar.getEvents();
     const completed = events.filter(event => event.extendedProps.completed).length;
     const pending = events.filter(event => !event.extendedProps.completed).length;
@@ -390,7 +396,13 @@ function setupEventListeners() {
     document.getElementById('visitForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // Disable submit button to prevent double submission
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Scheduling...';
+        
         const formData = new FormData(this);
+        
         fetch(this.action, {
             method: 'POST',
             body: formData
@@ -410,7 +422,17 @@ function setupEventListeners() {
         .catch(error => {
             console.error('Error:', error);
             showToast('Error scheduling visit', 'error');
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Schedule Visit';
         });
+    });
+    
+    // Modal events
+    document.getElementById('addVisitModal').addEventListener('hidden.bs.modal', function() {
+        document.getElementById('visitForm').reset();
     });
 }
 
@@ -425,10 +447,14 @@ function formatDateTime(date) {
     }).format(date);
 }
 
-function showToast(message, type) {
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
     // Create toast notification
     const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+    toast.className = `toast align-items-center text-white bg-${getToastColor(type)} border-0`;
     toast.setAttribute('role', 'alert');
     toast.innerHTML = `
         <div class="d-flex">
@@ -438,14 +464,26 @@ function showToast(message, type) {
     `;
     
     // Add to page and show
-    document.body.appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast);
+    document.querySelector('.toast-container').appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
     bsToast.show();
     
     // Remove after hidden
     toast.addEventListener('hidden.bs.toast', () => {
-        document.body.removeChild(toast);
+        if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+        }
     });
+}
+
+function getToastColor(type) {
+    const colors = {
+        'success': 'success',
+        'error': 'danger',
+        'warning': 'warning',
+        'info': 'info'
+    };
+    return colors[type] || 'info';
 }
 </script>
 {% endblock %} 

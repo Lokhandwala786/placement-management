@@ -438,6 +438,57 @@ def schedule_visit(request, pk):
 
 @tutor_required
 @handle_exceptions
+def schedule_visit_ajax(request):
+    """AJAX endpoint to schedule new visits"""
+    if request.method == 'POST':
+        try:
+            placement_id = request.POST.get('placement')
+            visit_date = request.POST.get('visit_date')
+            purpose = request.POST.get('purpose')
+            notes = request.POST.get('notes', '')
+            
+            # Validation
+            if not all([placement_id, visit_date, purpose]):
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'All required fields must be filled'
+                })
+            
+            # Get placement and verify tutor has access
+            placement = get_object_or_404(
+                PlacementRequest, 
+                pk=placement_id, 
+                approved_by_tutor=request.user
+            )
+            
+            # Create visit schedule
+            visit = VisitSchedule.objects.create(
+                placement_request=placement,
+                tutor=request.user,
+                visit_date=visit_date,
+                purpose=purpose,
+                notes=notes
+            )
+            
+            logger.info(f"New visit scheduled by tutor {request.user.username}: {visit.id}")
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Visit scheduled successfully!',
+                'visit_id': visit.id
+            })
+            
+        except Exception as e:
+            logger.error(f"Error scheduling visit: {str(e)}")
+            return JsonResponse({
+                'success': False, 
+                'message': 'Failed to schedule visit. Please try again.'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+@tutor_required
+@handle_exceptions
 def view_student(request, pk):
     """View detailed student information for tutors"""
     student = get_object_or_404(
@@ -474,32 +525,57 @@ def view_student(request, pk):
 @handle_exceptions
 def calendar_view(request):
     """Enhanced calendar view with FullCalendar integration"""
-    # Get all visits for this tutor
-    visits = VisitSchedule.objects.filter(
-        tutor=request.user
-    ).select_related('placement_request__student__user', 'placement_request__provider__user').order_by('visit_date')
-    
-    # Get approved placements for scheduling new visits
-    approved_placements = PlacementRequest.objects.filter(
-        approved_by_tutor=request.user,
-        status='approved_by_tutor'
-    ).select_related('student__user', 'provider__user')
-    
-    # Group visits by month for the template
-    visits_by_month = {}
-    for visit in visits:
-        month_key = visit.visit_date.strftime('%Y-%m')
-        if month_key not in visits_by_month:
-            visits_by_month[month_key] = []
-        visits_by_month[month_key].append(visit)
-    
-    context = {
-        'visits_by_month': visits_by_month,
-        'total_visits': visits.count(),
-        'upcoming_visits': visits.filter(visit_date__gte=timezone.now()).count(),
-        'approved_placements': approved_placements,
-    }
-    return render(request, 'tutors/calendar.html', context)
+    try:
+        # Get all visits for this tutor
+        visits = VisitSchedule.objects.filter(
+            tutor=request.user
+        ).select_related(
+            'placement_request__student__user', 
+            'placement_request__provider__user'
+        ).order_by('visit_date')
+        
+        # Get approved placements for scheduling new visits
+        approved_placements = PlacementRequest.objects.filter(
+            approved_by_tutor=request.user,
+            status='approved_by_tutor'
+        ).select_related('student__user', 'provider__user')
+        
+        # Prepare visits data for FullCalendar
+        visits_data = []
+        for visit in visits:
+            visits_data.append({
+                'id': visit.id,
+                'title': visit.purpose,
+                'start': visit.visit_date.isoformat(),
+                'end': visit.visit_date.isoformat(),
+                'extendedProps': {
+                    'placement': visit.placement_request.company_name,
+                    'student': f"{visit.placement_request.student.user.first_name} {visit.placement_request.student.user.last_name}",
+                    'purpose': visit.purpose,
+                    'notes': visit.notes or '',
+                    'completed': visit.completed,
+                    'placementId': visit.placement_request.id,
+                    'tutor': visit.tutor.username
+                },
+                'backgroundColor': '#28a745' if visit.completed else '#ffc107',
+                'borderColor': '#28a745' if visit.completed else '#ffc107',
+                'textColor': 'white' if visit.completed else 'black'
+            })
+        
+        context = {
+            'visits_data': visits_data,
+            'total_visits': visits.count(),
+            'upcoming_visits': visits.filter(visit_date__gte=timezone.now()).count(),
+            'approved_placements': approved_placements,
+        }
+        
+        logger.info(f"Calendar view loaded for tutor {request.user.username} with {len(visits_data)} visits")
+        return render(request, 'tutors/calendar.html', context)
+        
+    except Exception as e:
+        logger.error(f"Error in calendar view: {str(e)}")
+        messages.error(request, "Failed to load calendar. Please try again.")
+        return redirect('tutors:dashboard')
 
 @tutor_required
 @handle_exceptions

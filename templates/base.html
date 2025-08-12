@@ -19,6 +19,28 @@
                 <a class="nav-link" href="{% url 'core:map_view' %}">
                     <i class="fas fa-map-marked-alt"></i> Map View
                 </a>
+                
+                <!-- Role-based navigation -->
+                {% if user.tutorprofile %}
+                    <a class="nav-link" href="{% url 'tutors:dashboard' %}">
+                        <i class="fas fa-chalkboard-teacher"></i> Tutor Dashboard
+                    </a>
+                    <a class="nav-link" href="{% url 'tutors:calendar' %}">
+                        <i class="fas fa-calendar-alt"></i> Calendar
+                    </a>
+                {% endif %}
+                
+                {% if user.studentprofile %}
+                    <a class="nav-link" href="{% url 'students:dashboard' %}">
+                        <i class="fas fa-user-graduate"></i> Student Dashboard
+                    </a>
+                {% endif %}
+                
+                {% if user.providerprofile %}
+                    <a class="nav-link" href="{% url 'providers:dashboard' %}">
+                        <i class="fas fa-building"></i> Provider Dashboard
+                    </a>
+                {% endif %}
             </div>
             <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
