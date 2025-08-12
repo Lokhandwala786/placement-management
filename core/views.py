@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from accounts.models import StudentProfile, TutorProfile, ProviderProfile
 from placements.models import PlacementRequest
 import logging
@@ -96,6 +97,12 @@ def tutor_dashboard(request):
 def provider_dashboard(request):
     """Redirect to providers dashboard"""
     return redirect('providers:dashboard')
+
+# Messages view
+@login_required
+def messages_view(request):
+    """Messages/inbox view for all users"""
+    return render(request, 'messages/inbox.html')
 
 # Placement views - redirect to appropriate app
 def create_placement_request(request):
