@@ -40,6 +40,9 @@
                     <a class="nav-link" href="{% url 'students:dashboard' %}">
                         <i class="fas fa-user-graduate"></i> Student Dashboard
                     </a>
+                    <a class="nav-link" href="{% url 'students:calendar' %}">
+                        <i class="fas fa-calendar-alt"></i> My Calendar
+                    </a>
                 {% endif %}
                 
                 {% if user.providerprofile %}

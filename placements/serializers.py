@@ -117,13 +117,31 @@ class MessageListSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and obj.sender == request.user:
             return "From me"
-        return f"{obj.sender.first_name} {obj.sender.last_name}"
+        
+        # Handle cases where names might be empty
+        first_name = obj.sender.first_name or ""
+        last_name = obj.sender.last_name or ""
+        full_name = f"{first_name} {last_name}".strip()
+        
+        # If no name is available, use username
+        if not full_name:
+            return obj.sender.username
+        return full_name
     
     def get_recipient_name(self, obj):
         request = self.context.get('request')
         if request and obj.recipient == request.user:
             return "To me"
-        return f"{obj.recipient.first_name} {obj.recipient.last_name}"
+        
+        # Handle cases where names might be empty
+        first_name = obj.recipient.first_name or ""
+        last_name = obj.recipient.last_name or ""
+        full_name = f"{first_name} {last_name}".strip()
+        
+        # If no name is available, use username
+        if not full_name:
+            return obj.recipient.username
+        return full_name
     
     def get_placement_title(self, obj):
         return obj.placement_request.company_name if obj.placement_request else None

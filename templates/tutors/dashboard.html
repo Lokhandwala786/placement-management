@@ -77,6 +77,22 @@
                 </div>
             </div>
         </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="mb-0">{{ stats.completed_visits }}</h4>
+                            <p class="mb-0">Completed Visits</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-double fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Quick Actions -->
@@ -161,19 +177,43 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if upcoming_visits %}
-                        {% for visit in upcoming_visits %}
+                    {% if next_3_visits %}
+                        {% for visit in next_3_visits %}
                         <div class="border-bottom pb-3 mb-3">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h6 class="mb-1">{{ visit.placement_request.company_name }}</h6>
-                                    <p class="text-muted mb-1">{{ visit.purpose }}</p>
-                                    <small class="text-muted">{{ visit.visit_date|date:"M d, Y H:i" }}</small>
+                                    <p class="text-muted mb-1">
+                                        <i class="fas fa-user-graduate me-1"></i>{{ visit.placement_request.student.user.get_full_name }}
+                                    </p>
+                                    <p class="text-muted mb-1">
+                                        <i class="fas fa-bullseye me-1"></i>{{ visit.purpose }}
+                                    </p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ visit.visit_date|date:"M d, Y H:i" }}
+                                    </small>
                                 </div>
-                                <span class="badge bg-info">Scheduled</span>
+                                <div class="text-end">
+                                    <span class="badge bg-info mb-2">Scheduled</span>
+                                    <br>
+                                    <small class="text-muted">
+                                        {% if visit.visit_date|date:"Y-m-d" == "now"|date:"Y-m-d" %}
+                                            <span class="text-warning">Today!</span>
+                                        {% else %}
+                                            {{ visit.visit_date|timeuntil }} left
+                                        {% endif %}
+                                    </small>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
+                        {% if upcoming_visits|length > 3 %}
+                        <div class="text-center">
+                            <a href="{% url 'tutors:calendar' %}" class="btn btn-outline-info">
+                                View All {{ upcoming_visits|length }} Visits
+                            </a>
+                        </div>
+                        {% endif %}
                     {% else %}
                         <p class="text-muted text-center">No upcoming visits scheduled.</p>
                     {% endif %}
@@ -181,5 +221,54 @@
             </div>
         </div>
     </div>
+    
+    <!-- Recent Completed Visits -->
+    {% if recent_completed_visits %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-double me-2"></i>Recently Completed Visits
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Student</th>
+                                    <th>Purpose</th>
+                                    <th>Visit Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for visit in recent_completed_visits %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ visit.placement_request.company_name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ visit.placement_request.location }}</small>
+                                    </td>
+                                    <td>{{ visit.placement_request.student.user.get_full_name }}</td>
+                                    <td>{{ visit.purpose }}</td>
+                                    <td>{{ visit.visit_date|date:"M d, Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Completed
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %} 

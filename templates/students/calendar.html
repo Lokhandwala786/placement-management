@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Tutor Calendar - {{ site_name }}{% endblock %}
+{% block title %}My Calendar - {{ site_name }}{% endblock %}
 
 {% block extra_css %}
 <!-- FullCalendar CSS -->
@@ -46,7 +46,7 @@
     }
     
     /* Stats Section */
-    .calendar-stats {
+    .stats-section {
         margin-bottom: 2rem;
     }
     
@@ -88,6 +88,94 @@
     .stat-card .card-body {
         position: relative;
         padding: 1.5rem;
+    }
+    
+    /* Placement Section */
+    .placement-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .placement-title {
+        color: #202124;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+    
+    .placement-card {
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .placement-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #1a73e8;
+    }
+    
+    .placement-company {
+        color: #202124;
+        font-weight: 600;
+    }
+    
+    .placement-status {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    
+    .status-approved_by_tutor {
+        background-color: #e8f5e8;
+        color: #137333;
+    }
+    
+    .placement-details {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .placement-details i {
+        color: #1a73e8;
+        width: 16px;
+        margin-right: 0.5rem;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-actions .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e8eaed;
+        padding: 1rem 1.5rem;
+    }
+    
+    .quick-actions .card-body {
+        padding: 1.5rem;
+    }
+    
+    .action-btn {
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     
     /* FullCalendar Customization */
@@ -138,60 +226,62 @@
         color: #202124 !important;
     }
     
-    /* Event Styling */
-    .visit-event {
-        background: #1a73e8 !important;
-        color: white !important;
+    /* Simple Calendar Fallback */
+    .simple-calendar {
+        padding: 2rem;
     }
     
-    .completed-event {
-        background: #34a853 !important;
-        color: white !important;
+    .calendar-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     }
     
-    .upcoming-event {
-        background: #ea4335 !important;
-        color: white !important;
-    }
-    
-    /* Quick Actions */
-    .quick-actions {
+    .calendar-event-item {
         background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         border: 1px solid #e8eaed;
-        margin-bottom: 2rem;
-    }
-    
-    .quick-actions .card-header {
-        background: #f8f9fa;
-        border-bottom: 1px solid #e8eaed;
-        padding: 1rem 1.5rem;
-    }
-    
-    .quick-actions .card-body {
+        border-radius: 8px;
         padding: 1.5rem;
-    }
-    
-    .action-btn {
-        font-weight: 500;
-        border-radius: 6px;
-        padding: 0.75rem 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
     }
     
-    .action-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    .calendar-event-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #1a73e8;
+    }
+    
+    .event-date {
+        color: #1a73e8;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-title {
+        font-weight: 600;
+        color: #202124;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-time {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-location {
+        color: #5f6368;
+        font-size: 0.9rem;
+    }
+    
+    .event-location i {
+        color: #1a73e8;
+        margin-right: 0.5rem;
     }
     
     /* Modal Styles */
-    .modal-content {
-        border-radius: 8px;
-        border: none;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    }
-    
     .modal-header {
         background: #1a73e8;
         color: white;
@@ -221,56 +311,6 @@
         flex: 1;
     }
     
-    /* Schedule Visit Form */
-    .schedule-form {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e8eaed;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-    }
-    
-    .form-title {
-        color: #202124;
-        font-weight: 500;
-        margin-bottom: 1.5rem;
-    }
-    
-    .form-control {
-        border-radius: 6px;
-        border: 1px solid #dadce0;
-        padding: 0.75rem;
-        transition: all 0.2s ease;
-    }
-    
-    .form-control:focus {
-        border-color: #1a73e8;
-        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
-    }
-    
-    .btn-primary {
-        background-color: #1a73e8;
-        border-color: #1a73e8;
-        border-radius: 6px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-    
-    .btn-primary:hover {
-        background-color: #1557b0;
-        border-color: #1557b0;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
-    }
-    
-    .btn-primary:disabled {
-        background-color: #dadce0;
-        border-color: #dadce0;
-        cursor: not-allowed;
-    }
-    
     /* Responsive Design */
     @media (max-width: 768px) {
         .calendar-header {
@@ -289,7 +329,7 @@
             font-size: 1.5rem;
         }
         
-        .schedule-form {
+        .placement-section {
             padding: 1rem;
         }
     }
@@ -303,12 +343,12 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="calendar-title">
-                    <i class="fas fa-calendar-alt me-3"></i>Tutor Calendar
+                    <i class="fas fa-calendar-alt me-3"></i>My Calendar
                 </h1>
-                <p class="calendar-subtitle">Manage student visits and schedule new appointments</p>
+                <p class="calendar-subtitle">Manage your placement visits and important dates</p>
             </div>
             <div class="col-md-4 text-md-end">
-                <a href="{% url 'tutors:dashboard' %}" class="btn btn-outline-secondary">
+                <a href="{% url 'students:dashboard' %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
                 </a>
             </div>
@@ -316,7 +356,7 @@
     </div>
 
     <!-- Statistics Section -->
-    <div class="row calendar-stats">
+    <div class="row stats-section">
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="stat-card">
                 <div class="card-body text-center">
@@ -353,90 +393,56 @@
         <div class="col-lg-3 col-md-6 mb-3">
             <div class="stat-card">
                 <div class="card-body text-center">
-                    <div class="stat-number">{{ pending_requests|default:0 }}</div>
-                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-number">{{ approved_placements.count|default:0 }}</div>
+                    <div class="stat-label">Active Placements</div>
                     <div class="stat-icon">
-                        <i class="fas fa-hourglass-half"></i>
+                        <i class="fas fa-briefcase"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Schedule Visit Form -->
-    <div class="schedule-form">
-        <h5 class="form-title">
-            <i class="fas fa-plus-circle me-2"></i>Schedule New Visit
+    <!-- Placement Information Section -->
+    {% if approved_placements %}
+    <div class="placement-section">
+        <h5 class="placement-title">
+            <i class="fas fa-briefcase"></i> My Active Placements
         </h5>
-        <form method="post" action="{% url 'tutors:schedule_visit_simple' %}">
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-3">
-                    <label for="placement_request" class="form-label">Student Placement</label>
-                    <select class="form-control" id="placement_request" name="placement_request" required>
-                        <option value="">Select a placement</option>
-                        {% if available_placements %}
-                            {% for placement in available_placements %}
-                            <option value="{{ placement.id }}">
-                                {{ placement.student.user.first_name }} {{ placement.student.user.last_name }} - 
-                                {{ placement.company_name }}
-                                {% if placement.status == 'approved_by_provider' %}
-                                    (Pending Approval)
-                                {% elif placement.status == 'approved_by_tutor' %}
-                                    (Approved)
-                                {% elif placement.status == 'completed' %}
-                                    (Completed)
-                                {% endif %}
-                            </option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" disabled>No placements available for scheduling</option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-3">
-                    <label for="visit_date" class="form-label">Visit Date & Time</label>
-                    <input type="datetime-local" class="form-control" id="visit_date" name="visit_date" required>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-3">
-                    <label for="purpose" class="form-label">Purpose</label>
-                    <input type="text" class="form-control" id="purpose" name="purpose" placeholder="e.g., Progress Review, Final Assessment" required>
+        <div class="row">
+            {% for placement in approved_placements %}
+            <div class="col-lg-6 col-md-12 mb-3">
+                <div class="placement-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="placement-company mb-0">{{ placement.company_name }}</h6>
+                            <span class="placement-status status-{{ placement.status }}">
+                                {{ placement.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="placement-details">
+                            <i class="fas fa-map-marker-alt"></i>{{ placement.location }}
+                        </div>
+                        <div class="placement-details">
+                            <i class="fas fa-calendar"></i>
+                            <strong>Duration:</strong> {{ placement.start_date|date:"M d" }} - {{ placement.end_date|date:"M d, Y" }}
+                        </div>
+                        <div class="placement-details">
+                            <i class="fas fa-briefcase"></i>
+                            <strong>Position:</strong> {{ placement.job_title }}
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'students:placement_detail' placement.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <label for="notes" class="form-label">Notes (Optional)</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional notes about the visit..."></textarea>
-                </div>
-            </div>
-            <div class="mt-3">
-                <button type="submit" class="btn btn-primary" disabled>
-                    <i class="fas fa-calendar-plus me-2"></i>Schedule Visit
-                </button>
-            </div>
-        </form>
-        
-        <!-- Placement Information -->
-        <div class="mt-3">
-            <small class="text-muted">
-                <i class="fas fa-info-circle me-1"></i>
-                <strong>Available Placements:</strong>
-                {% if available_placements %}
-                    <span class="text-success">{{ available_placements.count }} placement(s) available</span>
-                    <br>
-                    • <span class="text-warning">Pending Approval:</span> Placements approved by provider, waiting for tutor approval
-                    <br>
-                    • <span class="text-success">Approved:</span> Placements approved by both provider and tutor
-                    <br>
-                    • <span class="text-info">Completed:</span> Finished placements for final assessments
-                {% else %}
-                    <span class="text-warning">No placements available</span>
-                    <br>
-                    Students need to apply for placements first, then providers need to approve them.
-                {% endif %}
-            </small>
+            {% endfor %}
         </div>
     </div>
+    {% endif %}
 
     <!-- Calendar Interface -->
     <div class="calendar-container">
@@ -507,8 +513,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="markCompleted">
-                    <i class="fas fa-check me-2"></i>Mark as Completed
+                <button type="button" class="btn btn-primary" id="addToPersonalCalendar">
+                    <i class="fas fa-plus me-2"></i>Add to Personal Calendar
                 </button>
             </div>
         </div>
@@ -530,7 +536,6 @@ try {
     console.error('Error parsing visits data:', e);
     visitsData = [];
 }
-
 let calendar;
 
 // Debug logging
@@ -541,7 +546,6 @@ console.log('Total visits:', visitsData.length);
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing calendar...');
     initializeCalendar();
-    setMinDateTime();
 });
 
 function initializeCalendar() {
@@ -554,7 +558,8 @@ function initializeCalendar() {
 
     // Check if FullCalendar is loaded
     if (typeof FullCalendar === 'undefined') {
-        console.error('FullCalendar not loaded');
+        console.error('FullCalendar not loaded, showing fallback');
+        showSimpleCalendar();
         return;
     }
 
@@ -601,20 +606,6 @@ function initializeCalendar() {
             },
             dayMaxEvents: true,
             moreLinkClick: 'popover',
-            locale: 'en',
-            firstDay: 1, // Monday
-            businessHours: {
-                daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
-                startTime: '09:00',
-                endTime: '17:00',
-            },
-            selectable: true,
-            selectMirror: true,
-            select: function(arg) {
-                // Handle date selection for scheduling
-                document.getElementById('visit_date').value = arg.startStr + 'T09:00';
-            },
-            editable: false,
             weekends: true,
             navLinks: true,
             nowIndicator: true,
@@ -630,25 +621,55 @@ function initializeCalendar() {
         
     } catch (error) {
         console.error('Error initializing FullCalendar:', error);
+        showSimpleCalendar();
     }
 }
 
-function setMinDateTime() {
-    // Set minimum date to today
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+function showSimpleCalendar() {
+    const calendarEl = document.getElementById('calendar');
     
-    const dateInput = document.getElementById('visit_date');
-    if (dateInput) {
-        const minDate = tomorrow.toISOString().slice(0, 16);
-        dateInput.min = minDate;
+    let content = '<div class="simple-calendar"><h4 class="text-center mb-4">Your Visits</h4>';
+    
+    if (visitsData.length === 0) {
+        content += `
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Visits Scheduled</h5>
+                <p class="text-muted">You don't have any scheduled visits yet.</p>
+            </div>
+        `;
+    } else {
+        content += '<div class="calendar-grid">';
+        
+        visitsData.forEach(visit => {
+            const startDate = new Date(visit.start);
+            const endDate = new Date(visit.end);
+            
+            content += `
+                <div class="calendar-event-item">
+                    <div class="event-date">
+                        <strong>${startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                    </div>
+                    <div class="event-title">${visit.title}</div>
+                    <div class="event-time">${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="event-location">
+                        <i class="fas fa-map-marker-alt"></i> ${visit.extendedProps && visit.extendedProps.location ? visit.extendedProps.location : 'Location'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        content += '</div>';
     }
+    
+    content += '</div>';
+    calendarEl.innerHTML = content;
 }
 
 function showVisitDetails(event) {
-    const visit = event.extendedProps;
+    const visit = event.extendedProps || {};
     const startDate = formatDateTime(event.start);
+    const endDate = formatDateTime(event.end);
     
     const content = `
         <div class="visit-detail-item">
@@ -657,18 +678,33 @@ function showVisitDetails(event) {
         </div>
         
         <div class="visit-detail-item">
-            <span class="visit-detail-label">Student:</span>
-            <span class="visit-detail-value">${visit.student || 'N/A'}</span>
-        </div>
-        
-        <div class="visit-detail-item">
             <span class="visit-detail-label">Company:</span>
             <span class="visit-detail-value">${visit.company || 'N/A'}</span>
         </div>
         
         <div class="visit-detail-item">
-            <span class="visit-detail-label">Date & Time:</span>
+            <span class="visit-detail-label">Position:</span>
+            <span class="visit-detail-value">${visit.job_title || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Location:</span>
+            <span class="visit-detail-value">${visit.location || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Tutor:</span>
+            <span class="visit-detail-value">${visit.tutor || 'Not Assigned'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Start Time:</span>
             <span class="visit-detail-value">${startDate}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">End Time:</span>
+            <span class="visit-detail-value">${endDate}</span>
         </div>
         
         <div class="visit-detail-item">
@@ -751,7 +787,7 @@ function viewUpcoming() {
 function viewCompleted() {
     if (calendar) {
         calendar.changeView('listWeek');
-        // Filter to show only upcoming events
+        // Filter to show only completed events
         calendar.getEvents().forEach(event => {
             if (event.extendedProps && event.extendedProps.completed) {
                 event.setProp('display', 'auto');
@@ -771,14 +807,14 @@ function exportCalendar() {
     }
     
     // Create CSV format data
-    let csvContent = 'Title,Start Date,End Date,Student,Company,Purpose,Status\n';
+    let csvContent = 'Title,Start Date,End Date,Location,Company,Purpose\n';
     
     visitsData.forEach(visit => {
         try {
             const startDate = new Date(visit.start).toLocaleDateString();
             const endDate = new Date(visit.end).toLocaleDateString();
             
-            csvContent += `"${visit.title}","${startDate}","${endDate}","${visit.extendedProps && visit.extendedProps.student ? visit.extendedProps.student : 'N/A'}","${visit.extendedProps && visit.extendedProps.company ? visit.extendedProps.company : 'N/A'}","${visit.extendedProps && visit.extendedProps.purpose ? visit.extendedProps.purpose : 'N/A'}","${visit.extendedProps && visit.extendedProps.completed ? 'Completed' : 'Scheduled'}"\n`;
+            csvContent += `"${visit.title}","${startDate}","${endDate}","${visit.extendedProps && visit.extendedProps.location ? visit.extendedProps.location : 'N/A'}","${visit.extendedProps && visit.extendedProps.company ? visit.extendedProps.company : 'N/A'}","${visit.extendedProps && visit.extendedProps.purpose ? visit.extendedProps.purpose : 'N/A'}"\n`;
         } catch (error) {
             console.error('Error exporting visit:', error);
         }
@@ -789,43 +825,19 @@ function exportCalendar() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'tutor_visits_calendar.csv';
+    a.download = 'my_placement_calendar.csv';
     a.click();
     window.URL.revokeObjectURL(url);
 }
 
-// Form validation
-document.getElementById('placement_request')?.addEventListener('change', function() {
-    const submitBtn = this.form.querySelector('button[type="submit"]');
-    if (this.value && document.getElementById('visit_date').value && document.getElementById('purpose').value) {
-        submitBtn.disabled = false;
-    } else {
-        submitBtn.disabled = true;
-    }
+// Add to personal calendar functionality
+document.getElementById('addToPersonalCalendar')?.addEventListener('click', function() {
+    alert('This feature would integrate with your personal calendar (Google Calendar, Outlook, etc.)');
 });
 
-document.getElementById('visit_date')?.addEventListener('change', function() {
-    const submitBtn = this.form.querySelector('button[type="submit"]');
-    if (document.getElementById('placement_request').value && this.value && document.getElementById('purpose').value) {
-        submitBtn.disabled = false;
-    } else {
-        submitBtn.disabled = true;
-    }
-});
-
-document.getElementById('purpose')?.addEventListener('input', function() {
-    const submitBtn = this.form.querySelector('button[type="submit"]');
-    if (document.getElementById('placement_request').value && document.getElementById('visit_date').value && this.value) {
-        submitBtn.disabled = false;
-    } else {
-        submitBtn.disabled = true;
-    }
-});
-
-// Mark visit as completed
-document.getElementById('markCompleted')?.addEventListener('click', function() {
-    // This would integrate with the backend to mark visits as completed
-    alert('This feature would mark the visit as completed in the system');
+// Add error handling for missing elements
+window.addEventListener('error', function(e) {
+    console.error('Global error:', e.error);
 });
 </script>
 {% endblock %}

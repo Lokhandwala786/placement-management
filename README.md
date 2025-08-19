@@ -256,6 +256,6 @@ For support and questions:
 
 ---
 
-⭐ **Star this repository if you find it helpful!** ⭐
+⭐ Star this repository if you find it helpful!⭐
 
-**Made with ❤️ by Lokhandwala786**
+Made with ❤️ by Lokhandwala786

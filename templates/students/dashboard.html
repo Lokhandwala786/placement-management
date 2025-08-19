@@ -20,6 +20,9 @@
                 <a href="{% url 'students:opportunity_list' %}" class="btn btn-success ms-2">
                     <i class="fas fa-briefcase me-2"></i>View Opportunities
                 </a>
+                <a href="{% url 'students:calendar' %}" class="btn btn-info ms-2">
+                    <i class="fas fa-calendar-alt me-2"></i>My Calendar
+                </a>
             </div>
             
             <!-- Statistics Cards -->
@@ -57,6 +60,42 @@
                             <i class="fas fa-trophy fa-2x mb-3"></i>
                             <h3 class="mb-1">{{ stats.completed }}</h3>
                             <p class="mb-0">Completed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Visit Statistics Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <h5 class="mb-3">
+                        <i class="fas fa-calendar-alt me-2"></i>Visit Statistics
+                    </h5>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar-check fa-2x mb-3"></i>
+                            <h3 class="mb-1">{{ visit_stats.total_visits }}</h3>
+                            <p class="mb-0">Total Visits</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clock fa-2x mb-3"></i>
+                            <h3 class="mb-1">{{ visit_stats.upcoming_visits }}</h3>
+                            <p class="mb-0">Upcoming Visits</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-check-circle fa-2x mb-3"></i>
+                            <h3 class="mb-1">{{ visit_stats.completed_visits }}</h3>
+                            <p class="mb-0">Completed Visits</p>
                         </div>
                     </div>
                 </div>

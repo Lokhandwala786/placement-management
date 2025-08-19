@@ -7,6 +7,7 @@ router.register(r'placements', api_views.PlacementRequestViewSet, basename='plac
 router.register(r'visits', api_views.VisitScheduleViewSet, basename='visit')
 router.register(r'reports', api_views.PlacementReportViewSet, basename='report')
 router.register(r'messages', api_views.MessageViewSet, basename='message')
+router.register(r'users', api_views.UserViewSet, basename='user')
 
 app_name = 'placements_api'
 

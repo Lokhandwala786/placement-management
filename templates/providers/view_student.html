@@ -32,7 +32,13 @@
                                         <dd class="col-sm-7">{{ student.user.email }}</dd>
                                         
                                         <dt class="col-sm-5">Phone Number</dt>
-                                        <dd class="col-sm-7">{{ student.phone|default:'Not provided' }}</dd>
+                                        <dd class="col-sm-7">
+                                            {% if student.user.phone %}
+                                                <span class="badge bg-primary">{{ student.user.phone }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Not provided</span>
+                                            {% endif %}
+                                        </dd>
                                     </dl>
                                 </div>
                                 <div class="col-md-6">
@@ -41,7 +47,13 @@
                                         <dd class="col-sm-7">{{ student.student_id }}</dd>
                                         
                                         <dt class="col-sm-5">Address</dt>
-                                        <dd class="col-sm-7">{{ student.address|default:'Not provided' }}</dd>
+                                        <dd class="col-sm-7">
+                                            {% if student.address %}
+                                                {{ student.address }}
+                                            {% else %}
+                                                <span class="text-muted">Not provided</span>
+                                            {% endif %}
+                                        </dd>
                                         
                                         <dt class="col-sm-5">Account Status</dt>
                                         <dd class="col-sm-7">
@@ -84,23 +96,30 @@
                                         <dt class="col-sm-5">CGPA</dt>
                                         <dd class="col-sm-7">
                                             {% if student.cgpa %}
-                                                {{ student.cgpa }}/10
+                                                <span class="badge bg-info">{{ student.cgpa }}/10</span>
                                             {% else %}
-                                                Not provided
+                                                <span class="text-muted">Not provided</span>
                                             {% endif %}
                                         </dd>
                                         
                                         <dt class="col-sm-5">Assigned Tutor</dt>
                                         <dd class="col-sm-7">
                                             {% if student.tutor %}
-                                                {{ student.tutor.user.get_full_name }} ({{ student.tutor.employee_id }})
+                                                <span class="badge bg-success">{{ student.tutor.user.get_full_name }}</span>
+                                                <br><small class="text-muted">ID: {{ student.tutor.employee_id }}</small>
                                             {% else %}
-                                                Not assigned
+                                                <span class="badge bg-warning text-dark">Not assigned</span>
                                             {% endif %}
                                         </dd>
                                         
                                         <dt class="col-sm-5">Course Description</dt>
-                                        <dd class="col-sm-7">{{ student.course.description|default:'No description available' }}</dd>
+                                        <dd class="col-sm-7">
+                                            {% if student.course.description %}
+                                                {{ student.course.description }}
+                                            {% else %}
+                                                <span class="text-muted">No description available</span>
+                                            {% endif %}
+                                        </dd>
                                     </dl>
                                 </div>
                             </div>
@@ -135,6 +154,41 @@
                     </div>
                     {% endif %}
                     
+                    <!-- Placement Requests Summary -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-chart-bar me-2"></i>Placement Requests Summary
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-primary text-white">
+                                        <div class="card-body text-center">
+                                            <h4 class="mb-0">{{ total_requests|default:0 }}</h4>
+                                            <small>Total Requests</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-warning text-dark">
+                                        <div class="card-body text-center">
+                                            <h4 class="mb-0">{{ pending_requests|default:0 }}</h4>
+                                            <small>Pending</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body text-center">
+                                            <h4 class="mb-0">{{ approved_requests|default:0 }}</h4>
+                                            <small>Approved</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Placement Requests Section -->
                     {% if placement_requests %}
                     <div class="row mb-4">

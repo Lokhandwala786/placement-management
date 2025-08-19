@@ -167,7 +167,7 @@ def publish_opportunity(request):
 def view_student(request, pk):
     """View detailed student information"""
     student = get_object_or_404(
-        StudentProfile.objects.select_related('user', 'course', 'tutor__user'), 
+        StudentProfile.objects.select_related('user', 'course', 'tutor__user', 'tutor__department'), 
         pk=pk
     )
     
@@ -177,8 +177,16 @@ def view_student(request, pk):
         provider=request.user.providerprofile
     ).order_by('-created_at')
     
+    # Get additional statistics
+    total_requests = placement_requests.count()
+    pending_requests = placement_requests.filter(status='pending').count()
+    approved_requests = placement_requests.filter(status__in=['approved_by_provider', 'approved_by_tutor']).count()
+    
     context = {
         'student': student,
         'placement_requests': placement_requests,
+        'total_requests': total_requests,
+        'pending_requests': pending_requests,
+        'approved_requests': approved_requests,
     }
     return render(request, 'providers/view_student.html', context)
