@@ -19,38 +19,6 @@
                 </div>
             </div>
 
-            <!-- Map Controls -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <div class="d-flex gap-2 flex-wrap">
-                                <button id="zoomIn" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-plus"></i> Zoom In
-                                </button>
-                                <button id="zoomOut" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-minus"></i> Zoom Out
-                                </button>
-                                <button id="resetMap" class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-home"></i> Reset
-                                </button>
-                                <button id="fullscreen" class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-expand"></i> Fullscreen
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-6 text-md-end">
-                            <div class="form-check form-switch d-inline-block">
-                                <input class="form-check-input" type="checkbox" id="clusteringToggle" checked>
-                                <label class="form-check-label" for="clusteringToggle">
-                                    Enable Clustering
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Map Container -->
             <div class="card">
                 <div class="card-body p-0">
@@ -64,35 +32,7 @@
                 </div>
             </div>
 
-            <!-- Legend -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Map Legend</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Status Colors:</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                <span class="badge bg-success">Approved</span>
-                                <span class="badge bg-warning">Pending</span>
-                                <span class="badge bg-danger">Rejected</span>
-                                <span class="badge bg-info">Completed</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Controls:</h6>
-                            <ul class="list-unstyled small">
-                                <li><i class="fas fa-mouse-pointer text-primary"></i> Click markers for details</li>
-                                <li><i class="fas fa-hand-paper text-info"></i> Drag to pan</li>
-                                <li><i class="fas fa-search-plus text-success"></i> Scroll to zoom</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Placements List -->
+            <!-- Simple Placements List -->
             <div class="card mt-4">
                 <div class="card-header">
                     <h6 class="mb-0"><i class="fas fa-list me-2"></i>Placements by Location</h6>
@@ -130,8 +70,17 @@
                     {% else %}
                         <div class="text-center py-4">
                             <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No placements with location data</h5>
-                            <p class="text-muted">Placements need latitude and longitude coordinates to appear on the map.</p>
+                            <h5 class="text-muted">No placements with location data yet</h5>
+                            <p class="text-muted mb-3">Placements will appear on the map once they have location information.</p>
+                            
+                            <div class="mt-3">
+                                <a href="{% url 'students:create_request' %}" class="btn btn-primary me-2">
+                                    <i class="fas fa-plus me-1"></i>Create Placement Request
+                                </a>
+                                <a href="{% url 'placements:list' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-list me-1"></i>View All Placements
+                                </a>
+                            </div>
                         </div>
                     {% endif %}
                 </div>
@@ -144,24 +93,17 @@
 <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=geometry,places"></script>
 
 <script>
-let map, markers = [], markerClusterer;
+let map, markers = [];
 const locations = JSON.parse('{{ locations|safe }}');
 
-// Debug: Log the locations data
-console.log('Locations data loaded:', locations);
-
 function initMap() {
+    console.log('Initializing map...');
+    
     // Default center (London, UK)
     const defaultCenter = { lat: 51.5074, lng: -0.1278 };
     
-    // Validate locations data
-    if (!Array.isArray(locations)) {
-        console.error('Invalid locations data:', locations);
-        locations = [];
-    }
-    
     // If we have locations, center on the first one
-    if (locations.length > 0) {
+    if (locations.length > 0 && locations[0].lat && locations[0].lng) {
         defaultCenter.lat = locations[0].lat;
         defaultCenter.lng = locations[0].lng;
     }
@@ -170,17 +112,7 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 10,
         center: defaultCenter,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
-        mapTypeControl: true,
-        streetViewControl: true,
-        fullscreenControl: false,
-        styles: [
-            {
-                featureType: 'poi',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }]
-            }
-        ]
+        mapTypeId: google.maps.MapTypeId.ROADMAP
     });
     
     // Hide loading, show map
@@ -189,33 +121,22 @@ function initMap() {
     
     // Add markers
     addMarkers();
-    
-    // Setup controls
-    setupMapControls();
 }
 
 function addMarkers() {
     if (!Array.isArray(locations) || locations.length === 0) {
-        console.log('No locations to display');
         return;
     }
     
     locations.forEach((location, index) => {
-        try {
-            // Validate location data
-            if (!location.lat || !location.lng || !location.placements || !Array.isArray(location.placements)) {
-                console.warn('Invalid location data at index', index, location);
-                return;
-            }
-            
+        if (location.lat && location.lng && location.placements) {
             const marker = new google.maps.Marker({
                 position: { lat: location.lat, lng: location.lng },
                 map: map,
-                title: location.company,
-                icon: getMarkerIcon(location.placements[0].status)
+                title: location.company
             });
             
-            // Create info window content
+            // Create info window
             const infoWindow = new google.maps.InfoWindow({
                 content: createInfoWindowContent(location)
             });
@@ -226,119 +147,37 @@ function addMarkers() {
             });
             
             markers.push(marker);
-        } catch (error) {
-            console.error('Error creating marker for location', index, error);
         }
     });
-    
-    // Setup marker clustering
-    setupMarkerClustering();
-}
-
-function getMarkerIcon(status) {
-    const colors = {
-        'approved': 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        'pending': 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-        'rejected': 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-        'completed': 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-    };
-    return colors[status.toLowerCase()] || colors['pending'];
 }
 
 function createInfoWindowContent(location) {
-    try {
-        let content = `
-            <div style="min-width: 250px;">
-                <h6 class="text-primary mb-2">${location.company}</h6>
-                <p class="mb-2"><i class="fas fa-map-marker-alt"></i> ${location.address}</p>
-                <p class="mb-2"><strong>${location.placements.length}</strong> placement(s)</p>
-                <div class="mb-2">
+    let content = `
+        <div style="min-width: 200px;">
+            <h6 class="text-primary mb-2">${location.company}</h6>
+            <p class="mb-2"><i class="fas fa-map-marker-alt"></i> ${location.address}</p>
+            <p class="mb-2"><strong>${location.placements.length}</strong> placement(s)</p>
+            <div class="mb-2">
+    `;
+    
+    location.placements.forEach(placement => {
+        content += `
+            <span class="badge bg-secondary me-1 mb-1">
+                ${placement.student.user.first_name} ${placement.student.user.last_name}
+            </span>
         `;
-        
-        location.placements.forEach(placement => {
-            const statusColor = getStatusColor(placement.status);
-            content += `
-                <span class="badge bg-${statusColor} me-1 mb-1">
-                    ${placement.student.user.first_name} ${placement.student.user.last_name}
-                </span>
-            `;
-        });
-        
-        content += '</div></div>';
-        return content;
-    } catch (error) {
-        console.error('Error creating info window content:', error);
-        return '<div>Error loading placement information</div>';
-    }
-}
-
-function getStatusColor(status) {
-    const colors = {
-        'approved': 'success',
-        'pending': 'warning',
-        'rejected': 'danger',
-        'completed': 'info'
-    };
-    return colors[status.toLowerCase()] || 'secondary';
-}
-
-function setupMarkerClustering() {
-    if (markers.length === 0) return;
-    
-    markerClusterer = new MarkerClusterer(map, markers, {
-        imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'
-    });
-}
-
-function setupMapControls() {
-    // Zoom controls
-    document.getElementById('zoomIn').addEventListener('click', () => {
-        map.setZoom(map.getZoom() + 1);
     });
     
-    document.getElementById('zoomOut').addEventListener('click', () => {
-        map.setZoom(map.getZoom() - 1);
-    });
-    
-    // Reset map
-    document.getElementById('resetMap').addEventListener('click', () => {
-        if (locations.length > 0) {
-            map.setCenter({ lat: locations[0].lat, lng: locations[0].lng });
-            map.setZoom(10);
-        } else {
-            map.setCenter({ lat: 51.5074, lng: -0.1278 });
-            map.setZoom(5);
-        }
-    });
-    
-    // Fullscreen
-    document.getElementById('fullscreen').addEventListener('click', () => {
-        const mapDiv = document.getElementById('map');
-        if (mapDiv.requestFullscreen) {
-            mapDiv.requestFullscreen();
-        } else if (mapDiv.webkitRequestFullscreen) {
-            mapDiv.webkitRequestFullscreen();
-        } else if (mapDiv.msRequestFullscreen) {
-            mapDiv.msRequestFullscreen();
-        }
-    });
-    
-    // Clustering toggle
-    document.getElementById('clusteringToggle').addEventListener('change', (e) => {
-        if (e.target.checked) {
-            setupMarkerClustering();
-        } else {
-            if (markerClusterer) {
-                markerClusterer.clearMarkers();
-                markerClusterer = null;
-            }
-        }
-    });
+    content += '</div></div>';
+    return content;
 }
 
 // Initialize map when page loads
 document.addEventListener('DOMContentLoaded', function() {
     try {
+        if (typeof google === 'undefined' || !google.maps) {
+            throw new Error('Google Maps API not loaded');
+        }
         initMap();
     } catch (error) {
         console.error('Error initializing map:', error);
@@ -346,7 +185,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="text-center">
                 <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
                 <p class="text-muted">Error loading map. Please refresh the page.</p>
-                <small class="text-muted">${error.message}</small>
+                <button class="btn btn-primary btn-sm" onclick="location.reload()">
+                    <i class="fas fa-redo me-1"></i>Reload Page
+                </button>
             </div>
         `;
     }

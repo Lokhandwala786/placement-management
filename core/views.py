@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from accounts.models import StudentProfile, TutorProfile, ProviderProfile
 from placements.models import PlacementRequest
 import logging
@@ -134,7 +135,7 @@ def map_view(request):
             longitude__isnull=False
         ).select_related('student__user', 'provider__user', 'student__course')
         
-        # Group placements by location for clustering
+        # Group placements by location
         locations = {}
         for placement in placements:
             location_key = f"{placement.latitude},{placement.longitude}"
@@ -172,6 +173,7 @@ def map_view(request):
             'locations': json.dumps(locations_list),
             'total_placements': placements.count(),
             'total_locations': len(locations),
+            'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         }
         return render(request, 'core/map_view.html', context)
         
@@ -182,5 +184,14 @@ def map_view(request):
             'locations': json.dumps([]),
             'total_placements': 0,
             'total_locations': 0,
+            'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
         }
         return render(request, 'core/map_view.html', context)
+
+
+def map_test(request):
+    """Test page for map functionality"""
+    context = {
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY,
+    }
+    return render(request, 'core/map_test.html', context)

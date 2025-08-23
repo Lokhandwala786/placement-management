@@ -619,6 +619,19 @@ def calendar_view(request):
         status__in=['approved_by_tutor', 'completed']
     ).select_related('student__user', 'provider__user')
     
+    # Get placements by status for better organization
+    pending_approval_placements = PlacementRequest.objects.filter(
+        status='approved_by_provider'
+    ).select_related('student__user', 'provider__user')
+    
+    approved_by_tutor_placements = PlacementRequest.objects.filter(
+        status='approved_by_tutor'
+    ).select_related('student__user', 'provider__user')
+    
+    completed_placements = PlacementRequest.objects.filter(
+        status='completed'
+    ).select_related('student__user', 'provider__user')
+    
     # Get all scheduled visits for this tutor
     scheduled_visits = VisitSchedule.objects.filter(
         tutor=tutor
@@ -641,7 +654,8 @@ def calendar_view(request):
                 'purpose': visit.purpose,
                 'tutor': f"{visit.tutor.first_name} {visit.tutor.last_name}",
                 'notes': visit.notes,
-                'completed': visit.completed
+                'completed': visit.completed,
+                'status': visit.placement_request.status
             }
         })
     
@@ -662,6 +676,9 @@ def calendar_view(request):
         'approved_placements': approved_placements,
         'pending_placements': pending_placements,
         'available_placements': available_placements,
+        'pending_approval_placements': pending_approval_placements,
+        'approved_by_tutor_placements': approved_by_tutor_placements,
+        'completed_placements': completed_placements,
     }
     
     return render(request, 'tutors/calendar.html', context)

@@ -271,6 +271,62 @@
         cursor: not-allowed;
     }
     
+    /* Simple Calendar Fallback */
+    .simple-calendar {
+        padding: 2rem;
+    }
+    
+    .calendar-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .calendar-event-item {
+        background: white;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .calendar-event-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #1a73e8;
+    }
+    
+    .event-date {
+        color: #1a73e8;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-title {
+        font-weight: 600;
+        color: #202124;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-time {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-location, .event-company {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .event-location i, .event-company i {
+        color: #1a73e8;
+        margin-right: 0.5rem;
+    }
+    
     /* Responsive Design */
     @media (max-width: 768px) {
         .calendar-header {
@@ -402,6 +458,19 @@
                     <label for="purpose" class="form-label">Purpose</label>
                     <input type="text" class="form-control" id="purpose" name="purpose" placeholder="e.g., Progress Review, Final Assessment" required>
                 </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label for="duration" class="form-label">Duration (Hours)</label>
+                    <select class="form-control" id="duration" name="duration" required>
+                        <option value="1">1 Hour</option>
+                        <option value="2">2 Hours</option>
+                        <option value="3">3 Hours</option>
+                        <option value="4">4 Hours</option>
+                        <option value="5">5 Hours</option>
+                        <option value="6">6 Hours</option>
+                        <option value="7">7 Hours</option>
+                        <option value="8">8 Hours</option>
+                    </select>
+                </div>
             </div>
             <div class="row">
                 <div class="col-12">
@@ -424,11 +493,15 @@
                 {% if available_placements %}
                     <span class="text-success">{{ available_placements.count }} placement(s) available</span>
                     <br>
-                    • <span class="text-warning">Pending Approval:</span> Placements approved by provider, waiting for tutor approval
-                    <br>
-                    • <span class="text-success">Approved:</span> Placements approved by both provider and tutor
-                    <br>
-                    • <span class="text-info">Completed:</span> Finished placements for final assessments
+                    {% if pending_approval_placements %}
+                        • <span class="text-warning">Pending Approval:</span> {{ pending_approval_placements.count }} placement(s) approved by provider, waiting for tutor approval
+                    {% endif %}
+                    {% if approved_by_tutor_placements %}
+                        • <span class="text-success">Approved:</span> {{ approved_by_tutor_placements.count }} placement(s) approved by both provider and tutor
+                    {% endif %}
+                    {% if completed_placements %}
+                        • <span class="text-info">Completed:</span> {{ completed_placements.count }} placement(s) finished for final assessments
+                    {% endif %}
                 {% else %}
                     <span class="text-warning">No placements available</span>
                     <br>
@@ -436,6 +509,63 @@
                 {% endif %}
             </small>
         </div>
+    </div>
+
+    <!-- Placement Status Overview -->
+    <div class="row mb-4">
+        {% if pending_approval_placements or approved_by_tutor_placements or completed_placements %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list-alt me-2"></i>Placement Status Overview
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if pending_approval_placements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded bg-warning bg-opacity-10">
+                                <i class="fas fa-clock text-warning fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1 text-warning">Pending Approval</h6>
+                                    <p class="mb-0 small">{{ pending_approval_placements.count }} placement(s)</p>
+                                    <small class="text-muted">Waiting for tutor approval</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if approved_by_tutor_placements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded bg-success bg-opacity-10">
+                                <i class="fas fa-check-circle text-success fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1 text-success">Approved</h6>
+                                    <p class="mb-0 small">{{ approved_by_tutor_placements.count }} placement(s)</p>
+                                    <small class="text-muted">Ready for visits</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if completed_placements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded bg-info bg-opacity-10">
+                                <i class="fas fa-flag-checkered text-info fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1 text-info">Completed</h6>
+                                    <p class="mb-0 small">{{ completed_placements.count }} placement(s)</p>
+                                    <small class="text-muted">Final assessments done</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Calendar Interface -->
@@ -563,22 +693,46 @@ function initializeCalendar() {
     // Prepare events for FullCalendar
     const events = [];
     
-    visitsData.forEach(visit => {
-        try {
-            events.push({
-                id: visit.id,
-                title: visit.title || 'Visit',
-                start: visit.start,
-                end: visit.end,
-                allDay: false,
-                backgroundColor: visit.extendedProps && visit.extendedProps.completed ? '#34a853' : '#1a73e8',
-                borderColor: visit.extendedProps && visit.extendedProps.completed ? '#137333' : '#1557b0',
-                extendedProps: visit.extendedProps || {}
-            });
-        } catch (error) {
-            console.error('Error processing visit:', visit, error);
-        }
-    });
+    if (visitsData && visitsData.length > 0) {
+        visitsData.forEach(visit => {
+            try {
+                // Calculate end time based on duration (default 1 hour)
+                const startDate = new Date(visit.start);
+                const endDate = new Date(startDate);
+                endDate.setHours(endDate.getHours() + 1); // Default 1 hour duration
+                
+                // Determine event color based on status
+                let eventColor = '#1a73e8'; // Default blue
+                let borderColor = '#1557b0';
+                
+                if (visit.extendedProps && visit.extendedProps.completed) {
+                    eventColor = '#34a853'; // Green for completed
+                    borderColor = '#137333';
+                } else if (visit.extendedProps && visit.extendedProps.status === 'pending_approval') {
+                    eventColor = '#f59e0b'; // Orange for pending
+                    borderColor = '#d97706';
+                } else if (visit.extendedProps && visit.extendedProps.status === 'approved_by_tutor') {
+                    eventColor = '#10b981'; // Green for approved
+                    borderColor = '#059669';
+                }
+                
+                events.push({
+                    id: visit.id,
+                    title: visit.title || 'Visit',
+                    start: visit.start,
+                    end: endDate.toISOString(),
+                    allDay: false,
+                    backgroundColor: eventColor,
+                    borderColor: borderColor,
+                    extendedProps: visit.extendedProps || {}
+                });
+            } catch (error) {
+                console.error('Error processing visit:', visit, error);
+            }
+        });
+    } else {
+        console.log('No visits data available');
+    }
 
     console.log('Processed events for calendar:', events);
 
@@ -630,6 +784,8 @@ function initializeCalendar() {
         
     } catch (error) {
         console.error('Error initializing FullCalendar:', error);
+        // Show fallback calendar
+        showSimpleCalendar();
     }
 }
 
@@ -644,6 +800,50 @@ function setMinDateTime() {
         const minDate = tomorrow.toISOString().slice(0, 16);
         dateInput.min = minDate;
     }
+}
+
+function showSimpleCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    
+    let content = '<div class="simple-calendar"><h4 class="text-center mb-4">Your Scheduled Visits</h4>';
+    
+    if (visitsData.length === 0) {
+        content += `
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Visits Scheduled</h5>
+                <p class="text-muted">You don't have any scheduled visits yet.</p>
+                <p class="text-muted">Use the form above to schedule new visits.</p>
+            </div>
+        `;
+    } else {
+        content += '<div class="calendar-grid">';
+        
+        visitsData.forEach(visit => {
+            const startDate = new Date(visit.start);
+            
+            content += `
+                <div class="calendar-event-item">
+                    <div class="event-date">
+                        <strong>${startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                    </div>
+                    <div class="event-title">${visit.title}</div>
+                    <div class="event-time">${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="event-location">
+                        <i class="fas fa-user"></i> ${visit.extendedProps && visit.extendedProps.student ? visit.extendedProps.student : 'Student'}
+                    </div>
+                    <div class="event-company">
+                        <i class="fas fa-building"></i> ${visit.extendedProps && visit.extendedProps.company ? visit.extendedProps.company : 'Company'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        content += '</div>';
+    }
+    
+    content += '</div>';
+    calendarEl.innerHTML = content;
 }
 
 function showVisitDetails(event) {

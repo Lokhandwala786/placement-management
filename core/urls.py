@@ -23,6 +23,7 @@ urlpatterns = [
     
     # Map View
     path('map/', views.map_view, name='map_view'),
+    path('map/test/', views.map_test, name='map_test'),
     
     # Messages
     path('messages/', views.messages_view, name='messages'),
