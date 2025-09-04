@@ -143,6 +143,16 @@
                                     <i class="fas fa-lock me-1"></i>Password *
                                 </label>
                                 {{ form.password1 }}
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <strong>Password Requirements:</strong><br>
+                                        <span class="password-requirement" data-requirement="length">○ At least 8 characters</span><br>
+                                        <span class="password-requirement" data-requirement="uppercase">○ One uppercase letter (A-Z)</span><br>
+                                        <span class="password-requirement" data-requirement="lowercase">○ One lowercase letter (a-z)</span><br>
+                                        <span class="password-requirement" data-requirement="number">○ One number (0-9)</span><br>
+                                        <span class="password-requirement" data-requirement="special">○ One special character (!@#$%^&*)</span>
+                                    </small>
+                                </div>
                                 {% if form.password1.errors %}
                                     <div class="invalid-feedback d-block">
                                         {% for error in form.password1.errors %}

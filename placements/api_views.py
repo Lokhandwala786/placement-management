@@ -6,6 +6,7 @@ from django.db.models import Q, Count
 from django.utils import timezone
 
 from .models import PlacementRequest, VisitSchedule, PlacementReport, Message
+from accounts.models import User
 from .serializers import (
     PlacementRequestSerializer, VisitScheduleSerializer, PlacementReportSerializer,
     PlacementRequestListSerializer, VisitScheduleListSerializer,
@@ -209,7 +210,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'create':
             return MessageCreateSerializer
-        elif self.action == 'list':
+        elif self.action in ['list', 'inbox', 'sent']:
             return MessageListSerializer
         return MessageSerializer
     
@@ -287,3 +288,68 @@ class MessageViewSet(viewsets.ModelViewSet):
             {'error': 'You can only delete messages you sent'},
             status=status.HTTP_403_FORBIDDEN
         )
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint for users (for recipient selection)
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = MessageSerializer  # We'll use a simple serializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username', 'first_name', 'last_name', 'email']
+    
+    def get_queryset(self):
+        """Return active users excluding the current user"""
+        user = self.request.user
+        return User.objects.filter(
+            is_active=True
+        ).exclude(id=user.id)
+    
+    def list(self, request, *args, **kwargs):
+        """Custom list method to return user data with profile information"""
+        queryset = self.get_queryset()
+        
+        # Get users with their profile information
+        users_data = []
+        for user in queryset:
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'user_type': user.user_type,
+                'tutorprofile': None,
+                'providerprofile': None,
+                'studentprofile': None,
+            }
+            
+            # Add profile information if available
+            if hasattr(user, 'tutorprofile'):
+                user_data['tutorprofile'] = {
+                    'id': user.tutorprofile.id,
+                    'employee_id': user.tutorprofile.employee_id,
+                    'department': user.tutorprofile.department.name if user.tutorprofile.department else None,
+                    'designation': user.tutorprofile.designation,
+                }
+            elif hasattr(user, 'providerprofile'):
+                user_data['providerprofile'] = {
+                    'id': user.providerprofile.id,
+                    'company_name': user.providerprofile.company_name,
+                    'industry': user.providerprofile.industry,
+                }
+            elif hasattr(user, 'studentprofile'):
+                user_data['studentprofile'] = {
+                    'id': user.studentprofile.id,
+                    'student_id': user.studentprofile.student_id,
+                    'course': user.studentprofile.course.name if user.studentprofile.course else None,
+                    'year': user.studentprofile.year,
+                }
+            
+            users_data.append(user_data)
+        
+        return Response({
+            'results': users_data,
+            'count': len(users_data)
+        })

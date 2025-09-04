@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Map Test - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>Map Functionality Test</h2>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Test Results</h5>
+                </div>
+                <div class="card-body">
+                    <div id="test-results">
+                        <p>Running tests...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Map Display</h5>
+                </div>
+                <div class="card-body">
+                    <div id="map" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Google Maps Script -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=geometry,places"></script>
+
+<script>
+let map;
+let testResults = [];
+
+function runTests() {
+    const resultsDiv = document.getElementById('test-results');
+    let html = '<h6>Test Results:</h6><ul>';
+    
+    // Test 1: Check if Google Maps API is loaded
+    try {
+        if (typeof google !== 'undefined' && google.maps) {
+            testResults.push('Google Maps API loaded successfully');
+            html += '<li class="text-success">Google Maps API loaded successfully</li>';
+        } else {
+            testResults.push('Google Maps API failed to load');
+            html += '<li class="text-danger">Google Maps API failed to load</li>';
+        }
+    } catch (error) {
+        testResults.push('Error checking Google Maps API: ' + error.message);
+        html += '<li class="text-danger">Error checking Google Maps API: ' + error.message + '</li>';
+    }
+    
+    // Test 2: Check if map can be created
+    try {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 10,
+            center: { lat: 51.5074, lng: -0.1278 },
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        testResults.push('Map created successfully');
+        html += '<li class="text-success">Map created successfully</li>';
+    } catch (error) {
+        testResults.push('Error creating map: ' + error.message);
+        html += '<li class="text-danger">Error creating map: ' + error.message + '</li>';
+    }
+    
+    // Test 3: Check if markers can be added
+    try {
+        const marker = new google.maps.Marker({
+            position: { lat: 51.5074, lng: -0.1278 },
+            map: map,
+            title: 'Test Marker'
+        });
+        testResults.push('Marker added successfully');
+        html += '<li class="text-success">Marker added successfully</li>';
+    } catch (error) {
+        testResults.push('Error adding marker: ' + error.message);
+        html += '<li class="text-danger">Error adding marker: ' + error.message + '</li>';
+    }
+    
+    // Test 4: Check if info windows work
+    try {
+        const infoWindow = new google.maps.InfoWindow({
+            content: '<div>Test Info Window</div>'
+        });
+        marker.addListener('click', () => {
+            infoWindow.open(map, marker);
+        });
+        testResults.push('Info window created and attached');
+        html += '<li class="text-success">Info window created and attached</li>';
+    } catch (error) {
+        testResults.push('Error creating info window: ' + error.message);
+        html += '<li class="text-danger">Error creating info window: ' + error.message + '</li>';
+    }
+    
+    html += '</ul>';
+    
+    // Summary
+    const successCount = testResults.filter(r => r.includes('successfully')).length;
+    const totalCount = testResults.length;
+    html += `<div class="alert alert-${successCount === totalCount ? 'success' : 'warning'} mt-3">
+        <strong>Summary:</strong> ${successCount}/${totalCount} tests passed
+    </div>`;
+    
+    resultsDiv.innerHTML = html;
+    
+    console.log('Test Results:', testResults);
+}
+
+// Run tests when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(runTests, 1000); // Wait for Google Maps to load
+});
+</script>
+{% endblock %}

@@ -1,0 +1,932 @@
+{% extends 'base.html' %}
+
+{% block title %}My Calendar - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
+
+<style>
+    /* Google Calendar Style */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+    
+    .calendar-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .calendar-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .calendar-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .calendar-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        margin: 0.5rem 0 0 0;
+        font-weight: 400;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .calendar-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #e8eaed;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        min-height: 600px;
+    }
+    
+    /* Stats Section */
+    .stats-section {
+        margin-bottom: 2rem;
+    }
+    
+    .stats-section .card {
+        transition: all 0.3s ease;
+        border: none;
+        overflow: hidden;
+        border-radius: 15px;
+        position: relative;
+    }
+    
+    .stats-section .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        z-index: 1;
+    }
+    
+    .stats-section .card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+    }
+    
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+    }
+    
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
+    }
+    
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%);
+    }
+    
+    .stats-section .card-body {
+        padding: 2.5rem 1.5rem;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+    
+    .stats-section .card i {
+        transition: all 0.4s ease;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+        display: block;
+    }
+    
+    .stats-section .card:hover i {
+        transform: scale(1.2) rotate(5deg);
+        opacity: 1;
+    }
+    
+    .stats-section h3 {
+        font-size: 3rem;
+        font-weight: 800;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+    
+    .stats-section p {
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        margin: 0;
+        opacity: 0.95;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Add subtle animation */
+    .stats-section .card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .stats-section .card:nth-child(1) { animation-delay: 0.1s; }
+    .stats-section .card:nth-child(2) { animation-delay: 0.2s; }
+    .stats-section .card:nth-child(3) { animation-delay: 0.3s; }
+    .stats-section .card:nth-child(4) { animation-delay: 0.4s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Placement Section */
+    .placement-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .placement-title {
+        color: #202124;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+    
+    .placement-card {
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .placement-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #1a73e8;
+    }
+    
+    .placement-company {
+        color: #202124;
+        font-weight: 600;
+    }
+    
+    .placement-status {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    
+    .status-approved_by_tutor {
+        background-color: #e8f5e8;
+        color: #137333;
+    }
+    
+    .placement-details {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .placement-details i {
+        color: #1a73e8;
+        width: 16px;
+        margin-right: 0.5rem;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-actions .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e8eaed;
+        padding: 1rem 1.5rem;
+    }
+    
+    .quick-actions .card-body {
+        padding: 1.5rem;
+    }
+    
+    .action-btn {
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* FullCalendar Customization */
+    .fc {
+        font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+    
+    .fc-toolbar {
+        margin-bottom: 1rem !important;
+    }
+    
+    .fc-button {
+        background-color: #1a73e8 !important;
+        border-color: #1a73e8 !important;
+        border-radius: 6px !important;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .fc-button:hover {
+        background-color: #1557b0 !important;
+        border-color: #1557b0 !important;
+    }
+    
+    .fc-button:disabled {
+        background-color: #dadce0 !important;
+        border-color: #dadce0 !important;
+        color: #5f6368 !important;
+    }
+    
+    .fc-event {
+        border-radius: 4px !important;
+        border: none !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .fc-daygrid-event {
+        padding: 2px 4px !important;
+    }
+    
+    .fc-day-today {
+        background-color: #e8f0fe !important;
+    }
+    
+    .fc-day-number {
+        font-weight: 500 !important;
+        color: #202124 !important;
+    }
+    
+    /* Simple Calendar Fallback */
+    .simple-calendar {
+        padding: 2rem;
+    }
+    
+    .calendar-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .calendar-event-item {
+        background: white;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .calendar-event-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #1a73e8;
+    }
+    
+    .event-date {
+        color: #1a73e8;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-title {
+        font-weight: 600;
+        color: #202124;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-time {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-location {
+        color: #5f6368;
+        font-size: 0.9rem;
+    }
+    
+    .event-location i {
+        color: #1a73e8;
+        margin-right: 0.5rem;
+    }
+    
+    /* Modal Styles */
+    .modal-header {
+        background: #1a73e8;
+        color: white;
+        border-bottom: none;
+    }
+    
+    .visit-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e8eaed;
+    }
+    
+    .visit-detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .visit-detail-label {
+        font-weight: 500;
+        color: #5f6368;
+        flex: 1;
+    }
+    
+    .visit-detail-value {
+        color: #202124;
+        flex: 1;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .calendar-header {
+            padding: 1rem;
+        }
+        
+        .calendar-title {
+            font-size: 1.25rem;
+        }
+        
+        .stat-card .card-body {
+            padding: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .placement-section {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Calendar Header -->
+    <div class="calendar-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="calendar-title">
+                    <i class="fas fa-calendar-alt me-3"></i>My Calendar
+                </h1>
+                <p class="calendar-subtitle">Manage your placement visits and important dates</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'students:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="stats-section">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="text-center">
+                    <h3 class="text-dark fw-bold mb-2">
+                        <i class="fas fa-chart-line me-3 text-primary"></i>Calendar Statistics
+                    </h3>
+                    <p class="text-muted mb-0">Your placement journey at a glance</p>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card bg-gradient-primary text-white h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>{{ visit_stats.total_visits|default:total_visits|default:0 }}</h3>
+                        <p>Total Visits</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card bg-gradient-success text-white h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="fas fa-clock"></i>
+                        <h3>{{ visit_stats.upcoming_visits|default:upcoming_visits|default:0 }}</h3>
+                        <p>Upcoming</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card bg-gradient-info text-white h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>{{ visit_stats.completed_visits|default:completed_visits|default:0 }}</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="card bg-gradient-warning text-white h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="fas fa-briefcase"></i>
+                        <h3>{{ approved_placements.count|default:0 }}</h3>
+                        <p>Active Placements</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placement Information Section -->
+    {% if approved_placements %}
+    <div class="placement-section">
+        <h5 class="placement-title">
+            <i class="fas fa-briefcase"></i> My Active Placements
+        </h5>
+        <div class="row">
+            {% for placement in approved_placements %}
+            <div class="col-lg-6 col-md-12 mb-3">
+                <div class="placement-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="placement-company mb-0">{{ placement.company_name }}</h6>
+                            <span class="placement-status status-{{ placement.status }}">
+                                {{ placement.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="placement-details">
+                            <i class="fas fa-map-marker-alt"></i>{{ placement.location }}
+                        </div>
+                        <div class="placement-details">
+                            <i class="fas fa-calendar"></i>
+                            <strong>Duration:</strong> {{ placement.start_date|date:"M d" }} - {{ placement.end_date|date:"M d, Y" }}
+                        </div>
+                        <div class="placement-details">
+                            <i class="fas fa-briefcase"></i>
+                            <strong>Position:</strong> {{ placement.job_title }}
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'students:placement_detail' placement.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Calendar Interface -->
+    <div class="calendar-container">
+        <div id="calendar">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Loading calendar...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="card-header">
+            <h5>
+                <i class="fas fa-bolt"></i> Quick Actions
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-primary" onclick="goToToday()">
+                            <i class="fas fa-calendar-day me-2"></i>Go to Today
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-success" onclick="viewUpcoming()">
+                            <i class="fas fa-clock me-2"></i>View Upcoming
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-info" onclick="viewCompleted()">
+                            <i class="fas fa-check-circle me-2"></i>View Completed
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-secondary" onclick="exportCalendar()">
+                            <i class="fas fa-download me-2"></i>Export Calendar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Visit Details Modal -->
+<div class="modal fade" id="visitDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle"></i> Visit Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="visitDetailsContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addToPersonalCalendar">
+                    <i class="fas fa-plus me-2"></i>Add to Personal Calendar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<script>
+// Store visits data for calendar
+var visitsDataRaw = '{{ visits_data|escapejs }}';
+var visitsData = [];
+try {
+    visitsData = JSON.parse(visitsDataRaw);
+} catch (e) {
+    console.error('Error parsing visits data:', e);
+    visitsData = [];
+}
+let calendar;
+
+// Debug logging
+console.log('Calendar data loaded:', visitsData);
+console.log('Total visits:', visitsData.length);
+
+// Initialize calendar when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing calendar...');
+    initializeCalendar();
+});
+
+function initializeCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    
+    if (!calendarEl) {
+        console.error('Calendar element not found');
+        return;
+    }
+
+    // Check if FullCalendar is loaded
+    if (typeof FullCalendar === 'undefined') {
+        console.error('FullCalendar not loaded, showing fallback');
+        showSimpleCalendar();
+        return;
+    }
+
+    console.log('Initializing FullCalendar with', visitsData.length, 'events');
+
+    // Prepare events for FullCalendar
+    const events = [];
+    
+    visitsData.forEach(visit => {
+        try {
+            events.push({
+                id: visit.id,
+                title: visit.title || 'Visit',
+                start: visit.start,
+                end: visit.end,
+                allDay: false,
+                backgroundColor: visit.extendedProps && visit.extendedProps.completed ? '#34a853' : '#1a73e8',
+                borderColor: visit.extendedProps && visit.extendedProps.completed ? '#137333' : '#1557b0',
+                extendedProps: visit.extendedProps || {}
+            });
+        } catch (error) {
+            console.error('Error processing visit:', visit, error);
+        }
+    });
+
+    console.log('Processed events for calendar:', events);
+
+    try {
+        // Initialize FullCalendar
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            height: 600,
+            events: events,
+            eventClick: function(info) {
+                showVisitDetails(info.event);
+            },
+            eventDidMount: function(info) {
+                info.el.title = `${info.event.title}\n${formatDateTime(info.event.start)}`;
+            },
+            dayMaxEvents: true,
+            moreLinkClick: 'popover',
+            weekends: true,
+            navLinks: true,
+            nowIndicator: true,
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }
+        });
+
+        calendar.render();
+        console.log('Calendar rendered successfully');
+        
+    } catch (error) {
+        console.error('Error initializing FullCalendar:', error);
+        showSimpleCalendar();
+    }
+}
+
+function showSimpleCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    
+    let content = '<div class="simple-calendar"><h4 class="text-center mb-4">Your Visits</h4>';
+    
+    if (visitsData.length === 0) {
+        content += `
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Visits Scheduled</h5>
+                <p class="text-muted">You don't have any scheduled visits yet.</p>
+            </div>
+        `;
+    } else {
+        content += '<div class="calendar-grid">';
+        
+        visitsData.forEach(visit => {
+            const startDate = new Date(visit.start);
+            const endDate = new Date(visit.end);
+            
+            content += `
+                <div class="calendar-event-item">
+                    <div class="event-date">
+                        <strong>${startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                    </div>
+                    <div class="event-title">${visit.title}</div>
+                    <div class="event-time">${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="event-location">
+                        <i class="fas fa-map-marker-alt"></i> ${visit.extendedProps && visit.extendedProps.location ? visit.extendedProps.location : 'Location'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        content += '</div>';
+    }
+    
+    content += '</div>';
+    calendarEl.innerHTML = content;
+}
+
+function showVisitDetails(event) {
+    const visit = event.extendedProps || {};
+    const startDate = formatDateTime(event.start);
+    const endDate = formatDateTime(event.end);
+    
+    const content = `
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Event:</span>
+            <span class="visit-detail-value fw-bold">${event.title}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Company:</span>
+            <span class="visit-detail-value">${visit.company || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Position:</span>
+            <span class="visit-detail-value">${visit.job_title || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Location:</span>
+            <span class="visit-detail-value">${visit.location || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Tutor:</span>
+            <span class="visit-detail-value">${visit.tutor || 'Not Assigned'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Start Time:</span>
+            <span class="visit-detail-value">${startDate}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">End Time:</span>
+            <span class="visit-detail-value">${endDate}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Purpose:</span>
+            <span class="visit-detail-value">${visit.purpose || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Status:</span>
+            <span class="visit-detail-value">
+                <span class="badge bg-${visit.completed ? 'success' : 'warning'}">
+                    ${visit.completed ? 'Completed' : 'Scheduled'}
+                </span>
+            </span>
+        </div>
+        
+        ${visit.notes ? `
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Notes:</span>
+            <span class="visit-detail-value text-muted">${visit.notes}</span>
+        </div>
+        ` : ''}
+    `;
+    
+    const modalContent = document.getElementById('visitDetailsContent');
+    if (modalContent) {
+        modalContent.innerHTML = content;
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('visitDetailsModal'));
+        modal.show();
+    }
+}
+
+function formatDateTime(dateString) {
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+        return date.toLocaleString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+    }
+}
+
+// Calendar navigation functions
+function goToToday() {
+    if (calendar) {
+        calendar.today();
+    } else {
+        alert('Calendar is not loaded yet');
+    }
+}
+
+function viewUpcoming() {
+    if (calendar) {
+        calendar.changeView('listWeek');
+        // Filter to show only upcoming events
+        calendar.getEvents().forEach(event => {
+            if (event.extendedProps && event.extendedProps.completed) {
+                event.setProp('display', 'none');
+            } else {
+                event.setProp('display', 'auto');
+            }
+        });
+    } else {
+        alert('Calendar is not loaded yet');
+    }
+}
+
+function viewCompleted() {
+    if (calendar) {
+        calendar.changeView('listWeek');
+        // Filter to show only completed events
+        calendar.getEvents().forEach(event => {
+            if (event.extendedProps && event.extendedProps.completed) {
+                event.setProp('display', 'auto');
+            } else {
+                event.setProp('display', 'none');
+            }
+        });
+    } else {
+        alert('Calendar is not loaded yet');
+    }
+}
+
+function exportCalendar() {
+    if (visitsData.length === 0) {
+        alert('No visits to export');
+        return;
+    }
+    
+    // Create CSV format data
+    let csvContent = 'Title,Start Date,End Date,Location,Company,Purpose\n';
+    
+    visitsData.forEach(visit => {
+        try {
+            const startDate = new Date(visit.start).toLocaleDateString();
+            const endDate = new Date(visit.end).toLocaleDateString();
+            
+            csvContent += `"${visit.title}","${startDate}","${endDate}","${visit.extendedProps && visit.extendedProps.location ? visit.extendedProps.location : 'N/A'}","${visit.extendedProps && visit.extendedProps.company ? visit.extendedProps.company : 'N/A'}","${visit.extendedProps && visit.extendedProps.purpose ? visit.extendedProps.purpose : 'N/A'}"\n`;
+        } catch (error) {
+            console.error('Error exporting visit:', error);
+        }
+    });
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'my_placement_calendar.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Add to personal calendar functionality
+document.getElementById('addToPersonalCalendar')?.addEventListener('click', function() {
+    alert('This feature would integrate with your personal calendar (Google Calendar, Outlook, etc.)');
+});
+
+// Add error handling for missing elements
+window.addEventListener('error', function(e) {
+    console.error('Global error:', e.error);
+});
+</script>
+{% endblock %}

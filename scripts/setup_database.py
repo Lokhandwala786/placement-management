@@ -37,11 +37,11 @@ def create_superuser():
                 user_type='tutor',
                 is_verified=True
             )
-            print(f"✅ Superuser created: {admin_user.username}")
+            print(f"Superuser created: {admin_user.username}")
         else:
-            print("ℹ️  Superuser already exists")
+            print("Superuser already exists")
     except Exception as e:
-        print(f"❌ Error creating superuser: {e}")
+        print(f"Error creating superuser: {e}")
 
 def create_sample_tutors():
     """Create sample tutor accounts"""
@@ -90,11 +90,11 @@ def create_sample_tutors():
                     designation=tutor_data['designation'],
                     office_location=tutor_data['office_location']
                 )
-                print(f"✅ Tutor created: {user.get_full_name()}")
+                print(f"Tutor created: {user.get_full_name()}")
             else:
-                print(f"ℹ️  Tutor already exists: {tutor_data['username']}")
+                print(f"Tutor already exists: {tutor_data['username']}")
         except Exception as e:
-            print(f"❌ Error creating tutor {tutor_data['username']}: {e}")
+            print(f"Error creating tutor {tutor_data['username']}: {e}")
 
 def create_sample_providers():
     """Create sample provider accounts"""
@@ -149,11 +149,11 @@ def create_sample_providers():
                     company_size=provider_data['company_size'],
                     industry=provider_data['industry']
                 )
-                print(f"✅ Provider created: {provider_data['company_name']}")
+                print(f"Provider created: {provider_data['company_name']}")
             else:
-                print(f"ℹ️  Provider already exists: {provider_data['username']}")
+                print(f"Provider already exists: {provider_data['username']}")
         except Exception as e:
-            print(f"❌ Error creating provider {provider_data['username']}: {e}")
+            print(f"Error creating provider {provider_data['username']}: {e}")
 
 def create_sample_students():
     """Create sample student accounts"""
@@ -202,11 +202,11 @@ def create_sample_students():
                     year=student_data['year'],
                     cgpa=student_data['cgpa']
                 )
-                print(f"✅ Student created: {user.get_full_name()}")
+                print(f"Student created: {user.get_full_name()}")
             else:
-                print(f"ℹ️  Student already exists: {student_data['username']}")
+                print(f"Student already exists: {student_data['username']}")
         except Exception as e:
-            print(f"❌ Error creating student {student_data['username']}: {e}")
+            print(f"Error creating student {student_data['username']}: {e}")
 
 def create_sample_placements():
     """Create sample placement requests"""
@@ -217,7 +217,7 @@ def create_sample_placements():
         tutor = User.objects.filter(user_type='tutor').first()
         
         if not all([student, provider, tutor]):
-            print("⚠️  Need at least one student, provider, and tutor to create placements")
+            print("Need at least one student, provider, and tutor to create placements")
             return
         
         # Create sample placement request
@@ -233,16 +233,16 @@ def create_sample_placements():
                 location='Tech City, TC 12345',
                 status='pending'
             )
-            print(f"✅ Placement request created: {placement.job_title}")
+            print(f"Placement request created: {placement.job_title}")
         else:
-            print("ℹ️  Sample placement request already exists")
+            print("Sample placement request already exists")
             
     except Exception as e:
-        print(f"❌ Error creating sample placements: {e}")
+        print(f"Error creating sample placements: {e}")
 
 def main():
     """Main function to set up the database"""
-    print("🚀 Setting up Placement Management System Database...")
+    print("Setting up Placement Management System Database...")
     print("=" * 50)
     
     # Create superuser
@@ -266,13 +266,13 @@ def main():
     create_sample_placements()
     
     print("\n" + "=" * 50)
-    print("✅ Database setup completed!")
-    print("\n📋 Default Login Credentials:")
+    print("Database setup completed!")
+    print("\nDefault Login Credentials:")
     print("Admin: admin / admin123")
     print("Tutor: tutor1 / tutor123")
     print("Provider: techcorp / provider123")
     print("Student: student1 / student123")
-    print("\n🌐 Access the admin panel at: http://localhost:8000/admin/")
+    print("\nAccess the admin panel at: http://localhost:8000/admin/")
 
 if __name__ == '__main__':
     main()

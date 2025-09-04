@@ -11,4 +11,5 @@ urlpatterns = [
     path('opportunities/', views.opportunity_list, name='opportunity_list'),
     path('opportunities/apply/<int:opportunity_id>/', views.apply_opportunity, name='apply_opportunity'),
     path('opportunity/<int:pk>/', views.opportunity_detail, name='opportunity_detail'),
+    path('calendar/', views.calendar_view, name='calendar'),
 ]

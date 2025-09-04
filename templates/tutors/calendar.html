@@ -1,489 +1,1031 @@
 {% extends 'base.html' %}
 
-{% block title %}Visit Calendar - {{ site_name }}{% endblock %}
+{% block title %}Tutor Calendar - {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
+
+<style>
+    /* Google Calendar Style */
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .calendar-header {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .calendar-title {
+        color: #1a73e8;
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0;
+    }
+    
+    .calendar-subtitle {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin: 0.5rem 0 0 0;
+    }
+    
+    .calendar-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #e8eaed;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        min-height: 600px;
+    }
+    
+    /* Stats Section */
+    .calendar-stats {
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        transition: all 0.2s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a73e8;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #5f6368;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .stat-icon {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        color: #1a73e8;
+        opacity: 0.7;
+    }
+    
+    .stat-card .card-body {
+        position: relative;
+        padding: 1.5rem;
+    }
+    
+    /* FullCalendar Customization */
+    .fc {
+        font-family: 'Google Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+    
+    .fc-toolbar {
+        margin-bottom: 1rem !important;
+    }
+    
+    .fc-button {
+        background-color: #1a73e8 !important;
+        border-color: #1a73e8 !important;
+        border-radius: 6px !important;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .fc-button:hover {
+        background-color: #1557b0 !important;
+        border-color: #1557b0 !important;
+    }
+    
+    .fc-button:disabled {
+        background-color: #dadce0 !important;
+        border-color: #dadce0 !important;
+        color: #5f6368 !important;
+    }
+    
+    .fc-event {
+        border-radius: 4px !important;
+        border: none !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .fc-daygrid-event {
+        padding: 2px 4px !important;
+    }
+    
+    .fc-day-today {
+        background-color: #e8f0fe !important;
+    }
+    
+    .fc-day-number {
+        font-weight: 500 !important;
+        color: #202124 !important;
+    }
+    
+    /* Event Styling */
+    .visit-event {
+        background: #1a73e8 !important;
+        color: white !important;
+    }
+    
+    .completed-event {
+        background: #34a853 !important;
+        color: white !important;
+    }
+    
+    .upcoming-event {
+        background: #ea4335 !important;
+        color: white !important;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-actions .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e8eaed;
+        padding: 1rem 1.5rem;
+    }
+    
+    .quick-actions .card-body {
+        padding: 1.5rem;
+    }
+    
+    .action-btn {
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+        background: #1a73e8;
+        color: white;
+        border-bottom: none;
+    }
+    
+    .visit-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e8eaed;
+    }
+    
+    .visit-detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .visit-detail-label {
+        font-weight: 500;
+        color: #5f6368;
+        flex: 1;
+    }
+    
+    .visit-detail-value {
+        color: #202124;
+        flex: 1;
+    }
+    
+    /* Schedule Visit Form */
+    .schedule-form {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e8eaed;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-title {
+        color: #202124;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #dadce0;
+        padding: 0.75rem;
+        transition: all 0.2s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+    
+    .btn-primary {
+        background-color: #1a73e8;
+        border-color: #1a73e8;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #1557b0;
+        border-color: #1557b0;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+    }
+    
+    .btn-primary:disabled {
+        background-color: #dadce0;
+        border-color: #dadce0;
+        cursor: not-allowed;
+    }
+    
+    /* Simple Calendar Fallback */
+    .simple-calendar {
+        padding: 2rem;
+    }
+    
+    .calendar-grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+    
+    .calendar-event-item {
+        background: white;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .calendar-event-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: #1a73e8;
+    }
+    
+    .event-date {
+        color: #1a73e8;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-title {
+        font-weight: 600;
+        color: #202124;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-time {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .event-location, .event-company {
+        color: #5f6368;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .event-location i, .event-company i {
+        color: #1a73e8;
+        margin-right: 0.5rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .calendar-header {
+            padding: 1rem;
+        }
+        
+        .calendar-title {
+            font-size: 1.25rem;
+        }
+        
+        .stat-card .card-body {
+            padding: 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+        }
+        
+        .schedule-form {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-4">
     <!-- Calendar Header -->
+    <div class="calendar-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="calendar-title">
+                    <i class="fas fa-calendar-alt me-3"></i>Tutor Calendar
+                </h1>
+                <p class="calendar-subtitle">Manage student visits and schedule new appointments</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'tutors:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row calendar-stats">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-number">{{ total_visits|default:0 }}</div>
+                    <div class="stat-label">Total Visits</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-number">{{ upcoming_visits|default:0 }}</div>
+                    <div class="stat-label">Upcoming</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-number">{{ completed_visits|default:0 }}</div>
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-number">{{ pending_requests|default:0 }}</div>
+                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Visit Form -->
+    <div class="schedule-form">
+        <h5 class="form-title">
+            <i class="fas fa-plus-circle me-2"></i>Schedule New Visit
+        </h5>
+        <form method="post" action="{% url 'tutors:schedule_visit_simple' %}">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label for="placement_request" class="form-label">Student Placement</label>
+                    <select class="form-control" id="placement_request" name="placement_request" required>
+                        <option value="">Select a placement</option>
+                        {% if available_placements %}
+                            {% for placement in available_placements %}
+                            <option value="{{ placement.id }}">
+                                {{ placement.student.user.first_name }} {{ placement.student.user.last_name }} - 
+                                {{ placement.company_name }}
+                                {% if placement.status == 'approved_by_provider' %}
+                                    (Pending Approval)
+                                {% elif placement.status == 'approved_by_tutor' %}
+                                    (Approved)
+                                {% elif placement.status == 'completed' %}
+                                    (Completed)
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>No placements available for scheduling</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label for="visit_date" class="form-label">Visit Date & Time</label>
+                    <input type="datetime-local" class="form-control" id="visit_date" name="visit_date" required>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label for="purpose" class="form-label">Purpose</label>
+                    <input type="text" class="form-control" id="purpose" name="purpose" placeholder="e.g., Progress Review, Final Assessment" required>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label for="duration" class="form-label">Duration (Hours)</label>
+                    <select class="form-control" id="duration" name="duration" required>
+                        <option value="1">1 Hour</option>
+                        <option value="2">2 Hours</option>
+                        <option value="3">3 Hours</option>
+                        <option value="4">4 Hours</option>
+                        <option value="5">5 Hours</option>
+                        <option value="6">6 Hours</option>
+                        <option value="7">7 Hours</option>
+                        <option value="8">8 Hours</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label for="notes" class="form-label">Notes (Optional)</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional notes about the visit..."></textarea>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary" disabled>
+                    <i class="fas fa-calendar-plus me-2"></i>Schedule Visit
+                </button>
+            </div>
+        </form>
+        
+        <!-- Placement Information -->
+        <div class="mt-3">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                <strong>Available Placements:</strong>
+                {% if available_placements %}
+                    <span class="text-success">{{ available_placements.count }} placement(s) available</span>
+                    <br>
+                    {% if pending_approval_placements %}
+                        • <span class="text-warning">Pending Approval:</span> {{ pending_approval_placements.count }} placement(s) approved by provider, waiting for tutor approval
+                    {% endif %}
+                    {% if approved_by_tutor_placements %}
+                        • <span class="text-success">Approved:</span> {{ approved_by_tutor_placements.count }} placement(s) approved by both provider and tutor
+                    {% endif %}
+                    {% if completed_placements %}
+                        • <span class="text-info">Completed:</span> {{ completed_placements.count }} placement(s) finished for final assessments
+                    {% endif %}
+                {% else %}
+                    <span class="text-warning">No placements available</span>
+                    <br>
+                    Students need to apply for placements first, then providers need to approve them.
+                {% endif %}
+            </small>
+        </div>
+    </div>
+
+    <!-- Placement Status Overview -->
     <div class="row mb-4">
+        {% if pending_approval_placements or approved_by_tutor_placements or completed_placements %}
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="mb-1">
-                        <i class="fas fa-calendar-alt me-2"></i>Visit Calendar
-                    </h2>
-                    <p class="text-muted mb-0">Schedule and manage placement visits</p>
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list-alt me-2"></i>Placement Status Overview
+                    </h6>
                 </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVisitModal">
-                        <i class="fas fa-plus me-2"></i>Schedule Visit
-                    </button>
-                    <button class="btn btn-outline-secondary" id="today-btn">
-                        <i class="fas fa-home me-2"></i>Today
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Calendar Stats -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ total_visits }}</h4>
-                            <small>Total Visits</small>
-                        </div>
-                        <i class="fas fa-calendar-check fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0">{{ upcoming_visits }}</h4>
-                            <small>Upcoming</small>
-                        </div>
-                        <i class="fas fa-clock fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0" id="completed-count">0</h4>
-                            <small>Completed</small>
-                        </div>
-                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="mb-0" id="pending-count">0</h4>
-                            <small>Pending</small>
-                        </div>
-                        <i class="fas fa-hourglass-half fa-2x opacity-75"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Calendar Container -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body p-0">
-                    <div id="calendar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Visit Modal -->
-<div class="modal fade" id="addVisitModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-plus-circle me-2"></i>Schedule New Visit
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="visitForm" method="post" action="{% url 'tutors:schedule_visit_ajax' %}">
-                {% csrf_token %}
-                <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="placement" class="form-label">Placement *</label>
-                            <select class="form-select" id="placement" name="placement" required>
-                                <option value="">Select Placement</option>
-                                {% for placement in approved_placements %}
-                                <option value="{{ placement.id }}">
-                                    {{ placement.student.user.first_name }} {{ placement.student.user.last_name }} - {{ placement.company_name }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                        {% if pending_approval_placements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded bg-warning bg-opacity-10">
+                                <i class="fas fa-clock text-warning fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1 text-warning">Pending Approval</h6>
+                                    <p class="mb-0 small">{{ pending_approval_placements.count }} placement(s)</p>
+                                    <small class="text-muted">Waiting for tutor approval</small>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="visit_date" class="form-label">Visit Date & Time *</label>
-                            <input type="datetime-local" class="form-control" id="visit_date" name="visit_date" required>
+                        {% endif %}
+                        
+                        {% if approved_by_tutor_placements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded bg-success bg-opacity-10">
+                                <i class="fas fa-check-circle text-success fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1 text-success">Approved</h6>
+                                    <p class="mb-0 small">{{ approved_by_tutor_placements.count }} placement(s)</p>
+                                    <small class="text-muted">Ready for visits</small>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="purpose" class="form-label">Purpose *</label>
-                            <input type="text" class="form-control" id="purpose" name="purpose" 
-                                   placeholder="e.g., Progress Review, Final Assessment" required>
+                        {% endif %}
+                        
+                        {% if completed_placements %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center p-3 border rounded bg-info bg-opacity-10">
+                                <i class="fas fa-flag-checkered text-info fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1 text-info">Completed</h6>
+                                    <p class="mb-0 small">{{ completed_placements.count }} placement(s)</p>
+                                    <small class="text-muted">Final assessments done</small>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="duration" class="form-label">Duration (hours)</label>
-                            <input type="number" class="form-control" id="duration" name="duration" 
-                                   min="0.5" max="8" step="0.5" value="2">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="notes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3" 
-                                  placeholder="Additional notes about the visit..."></textarea>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <i class="fas fa-save me-2"></i>Schedule Visit
-                    </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Calendar Interface -->
+    <div class="calendar-container">
+        <div id="calendar">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-            </form>
+                <p class="mt-3">Loading calendar...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <div class="card-header">
+            <h5>
+                <i class="fas fa-bolt"></i> Quick Actions
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-primary" onclick="goToToday()">
+                            <i class="fas fa-calendar-day me-2"></i>Go to Today
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-success" onclick="viewUpcoming()">
+                            <i class="fas fa-clock me-2"></i>View Upcoming
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-info" onclick="viewCompleted()">
+                            <i class="fas fa-check-circle me-2"></i>View Completed
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-grid">
+                        <button class="btn action-btn btn-outline-secondary" onclick="exportCalendar()">
+                            <i class="fas fa-download me-2"></i>Export Calendar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Visit Details Modal -->
 <div class="modal fade" id="visitDetailsModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="fas fa-info-circle me-2"></i>Visit Details
+                    <i class="fas fa-info-circle"></i> Visit Details
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="visitDetailsContent">
                 <!-- Content will be populated by JavaScript -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="markCompletedBtn" style="display: none;">
-                    <i class="fas fa-check me-2"></i>Mark Completed
+                <button type="button" class="btn btn-primary" id="markCompleted">
+                    <i class="fas fa-check me-2"></i>Mark as Completed
                 </button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Toast Container -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
-</div>
 {% endblock %}
 
 {% block scripts %}
-<!-- FullCalendar CSS and JS -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 
 <script>
-// Global variables
-let calendar;
-let currentEventId;
+// Store visits data for calendar
+var visitsDataRaw = '{{ visits_data|escapejs }}';
+var visitsData = [];
+try {
+    visitsData = JSON.parse(visitsDataRaw);
+} catch (e) {
+    console.error('Error parsing visits data:', e);
+    visitsData = [];
+}
 
-// Initialize when DOM is ready
+let calendar;
+
+// Debug logging
+console.log('Calendar data loaded:', visitsData);
+console.log('Total visits:', visitsData.length);
+
+// Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing calendar...');
     initializeCalendar();
-    setupEventListeners();
-    updateStats();
+    setMinDateTime();
 });
 
 function initializeCalendar() {
     const calendarEl = document.getElementById('calendar');
     
-    // Calendar configuration
-    calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
-        },
-        height: 'auto',
-        editable: true,
-        selectable: true,
-        selectMirror: true,
-        dayMaxEvents: true,
-        weekends: true,
-        locale: 'en-GB',
-        
-        // Events data from Django
-        events: {{ visits_data|safe }},
-        
-        // Event handling
-        eventClick: function(info) {
-            showVisitDetails(info.event);
-        },
-        
-        eventDrop: function(info) {
-            updateVisitDate(info.event);
-        },
-        
-        eventResize: function(info) {
-            updateVisitDate(info.event);
-        },
-        
-        select: function(info) {
-            // Pre-fill date when selecting a date
-            const selectedDate = info.startStr;
-            document.getElementById('visit_date').value = selectedDate;
-            new bootstrap.Modal(document.getElementById('addVisitModal')).show();
-        },
-        
-        // Custom event rendering
-        eventDidMount: function(info) {
-            // Add tooltip
-            const tooltip = new bootstrap.Tooltip(info.el, {
-                title: `${info.event.title}<br>${info.event.extendedProps.student}<br>${info.event.extendedProps.placement}`,
-                html: true,
-                placement: 'top',
-                trigger: 'hover'
-            });
-        },
-        
-        // Error handling
-        eventSourceFailure: function(error) {
-            console.error('Calendar event source error:', error);
-            showToast('Failed to load calendar events', 'error');
-        }
-    });
+    if (!calendarEl) {
+        console.error('Calendar element not found');
+        return;
+    }
+
+    // Check if FullCalendar is loaded
+    if (typeof FullCalendar === 'undefined') {
+        console.error('FullCalendar not loaded');
+        return;
+    }
+
+    console.log('Initializing FullCalendar with', visitsData.length, 'events');
+
+    // Prepare events for FullCalendar
+    const events = [];
     
-    calendar.render();
+    if (visitsData && visitsData.length > 0) {
+        visitsData.forEach(visit => {
+            try {
+                // Calculate end time based on duration (default 1 hour)
+                const startDate = new Date(visit.start);
+                const endDate = new Date(startDate);
+                endDate.setHours(endDate.getHours() + 1); // Default 1 hour duration
+                
+                // Determine event color based on status
+                let eventColor = '#1a73e8'; // Default blue
+                let borderColor = '#1557b0';
+                
+                if (visit.extendedProps && visit.extendedProps.completed) {
+                    eventColor = '#34a853'; // Green for completed
+                    borderColor = '#137333';
+                } else if (visit.extendedProps && visit.extendedProps.status === 'pending_approval') {
+                    eventColor = '#f59e0b'; // Orange for pending
+                    borderColor = '#d97706';
+                } else if (visit.extendedProps && visit.extendedProps.status === 'approved_by_tutor') {
+                    eventColor = '#10b981'; // Green for approved
+                    borderColor = '#059669';
+                }
+                
+                events.push({
+                    id: visit.id,
+                    title: visit.title || 'Visit',
+                    start: visit.start,
+                    end: endDate.toISOString(),
+                    allDay: false,
+                    backgroundColor: eventColor,
+                    borderColor: borderColor,
+                    extendedProps: visit.extendedProps || {}
+                });
+            } catch (error) {
+                console.error('Error processing visit:', visit, error);
+            }
+        });
+    } else {
+        console.log('No visits data available');
+    }
+
+    console.log('Processed events for calendar:', events);
+
+    try {
+        // Initialize FullCalendar
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            height: 600,
+            events: events,
+            eventClick: function(info) {
+                showVisitDetails(info.event);
+            },
+            eventDidMount: function(info) {
+                info.el.title = `${info.event.title}\n${formatDateTime(info.event.start)}`;
+            },
+            dayMaxEvents: true,
+            moreLinkClick: 'popover',
+            locale: 'en',
+            firstDay: 1, // Monday
+            businessHours: {
+                daysOfWeek: [1, 2, 3, 4, 5], // Monday - Friday
+                startTime: '09:00',
+                endTime: '17:00',
+            },
+            selectable: true,
+            selectMirror: true,
+            select: function(arg) {
+                // Handle date selection for scheduling
+                document.getElementById('visit_date').value = arg.startStr + 'T09:00';
+            },
+            editable: false,
+            weekends: true,
+            navLinks: true,
+            nowIndicator: true,
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }
+        });
+
+        calendar.render();
+        console.log('Calendar rendered successfully');
+        
+    } catch (error) {
+        console.error('Error initializing FullCalendar:', error);
+        // Show fallback calendar
+        showSimpleCalendar();
+    }
+}
+
+function setMinDateTime() {
+    // Set minimum date to today
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const dateInput = document.getElementById('visit_date');
+    if (dateInput) {
+        const minDate = tomorrow.toISOString().slice(0, 16);
+        dateInput.min = minDate;
+    }
+}
+
+function showSimpleCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    
+    let content = '<div class="simple-calendar"><h4 class="text-center mb-4">Your Scheduled Visits</h4>';
+    
+    if (visitsData.length === 0) {
+        content += `
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Visits Scheduled</h5>
+                <p class="text-muted">You don't have any scheduled visits yet.</p>
+                <p class="text-muted">Use the form above to schedule new visits.</p>
+            </div>
+        `;
+    } else {
+        content += '<div class="calendar-grid">';
+        
+        visitsData.forEach(visit => {
+            const startDate = new Date(visit.start);
+            
+            content += `
+                <div class="calendar-event-item">
+                    <div class="event-date">
+                        <strong>${startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                    </div>
+                    <div class="event-title">${visit.title}</div>
+                    <div class="event-time">${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="event-location">
+                        <i class="fas fa-user"></i> ${visit.extendedProps && visit.extendedProps.student ? visit.extendedProps.student : 'Student'}
+                    </div>
+                    <div class="event-company">
+                        <i class="fas fa-building"></i> ${visit.extendedProps && visit.extendedProps.company ? visit.extendedProps.company : 'Company'}
+                    </div>
+                </div>
+            `;
+        });
+        
+        content += '</div>';
+    }
+    
+    content += '</div>';
+    calendarEl.innerHTML = content;
 }
 
 function showVisitDetails(event) {
-    currentEventId = event.id;
+    const visit = event.extendedProps;
+    const startDate = formatDateTime(event.start);
     
     const content = `
-        <div class="row">
-            <div class="col-12">
-                <h6 class="text-primary mb-3">${event.title}</h6>
-                <dl class="row">
-                    <dt class="col-sm-4">Student:</dt>
-                    <dd class="col-sm-8">${event.extendedProps.student}</dd>
-                    
-                    <dt class="col-sm-4">Company:</dt>
-                    <dd class="col-sm-8">${event.extendedProps.placement}</dd>
-                    
-                    <dt class="col-sm-4">Date & Time:</dt>
-                    <dd class="col-sm-8">${formatDateTime(event.start)}</dd>
-                    
-                    <dt class="col-sm-4">Purpose:</dt>
-                    <dd class="col-sm-8">${event.extendedProps.purpose}</dd>
-                    
-                    <dt class="col-sm-4">Status:</dt>
-                    <dd class="col-sm-8">
-                        <span class="badge bg-${event.extendedProps.completed ? 'success' : 'warning'}">
-                            ${event.extendedProps.completed ? 'Completed' : 'Pending'}
-                        </span>
-                    </dd>
-                </dl>
-                
-                ${event.extendedProps.notes ? `
-                <div class="mt-3">
-                    <strong>Notes:</strong>
-                    <p class="text-muted">${event.extendedProps.notes}</p>
-                </div>
-                ` : ''}
-            </div>
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Event:</span>
+            <span class="visit-detail-value fw-bold">${event.title}</span>
         </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Student:</span>
+            <span class="visit-detail-value">${visit.student || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Company:</span>
+            <span class="visit-detail-value">${visit.company || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Date & Time:</span>
+            <span class="visit-detail-value">${startDate}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Purpose:</span>
+            <span class="visit-detail-value">${visit.purpose || 'N/A'}</span>
+        </div>
+        
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Status:</span>
+            <span class="visit-detail-value">
+                <span class="badge bg-${visit.completed ? 'success' : 'warning'}">
+                    ${visit.completed ? 'Completed' : 'Scheduled'}
+                </span>
+            </span>
+        </div>
+        
+        ${visit.notes ? `
+        <div class="visit-detail-item">
+            <span class="visit-detail-label">Notes:</span>
+            <span class="visit-detail-value text-muted">${visit.notes}</span>
+        </div>
+        ` : ''}
     `;
     
-    document.getElementById('visitDetailsContent').innerHTML = content;
-    
-    // Show/hide mark completed button
-    const markCompletedBtn = document.getElementById('markCompletedBtn');
-    if (!event.extendedProps.completed) {
-        markCompletedBtn.style.display = 'block';
-        markCompletedBtn.onclick = () => markVisitCompleted(event.id);
+    const modalContent = document.getElementById('visitDetailsContent');
+    if (modalContent) {
+        modalContent.innerHTML = content;
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('visitDetailsModal'));
+        modal.show();
+    }
+}
+
+function formatDateTime(dateString) {
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+        return date.toLocaleString('en-GB', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        return dateString;
+    }
+}
+
+// Calendar navigation functions
+function goToToday() {
+    if (calendar) {
+        calendar.today();
     } else {
-        markCompletedBtn.style.display = 'none';
+        alert('Calendar is not loaded yet');
+    }
+}
+
+function viewUpcoming() {
+    if (calendar) {
+        calendar.changeView('listWeek');
+        // Filter to show only upcoming events
+        calendar.getEvents().forEach(event => {
+            if (event.extendedProps && event.extendedProps.completed) {
+                event.setProp('display', 'none');
+            } else {
+                event.setProp('display', 'auto');
+            }
+        });
+    } else {
+        alert('Calendar is not loaded yet');
+    }
+}
+
+function viewCompleted() {
+    if (calendar) {
+        calendar.changeView('listWeek');
+        // Filter to show only upcoming events
+        calendar.getEvents().forEach(event => {
+            if (event.extendedProps && event.extendedProps.completed) {
+                event.setProp('display', 'auto');
+            } else {
+                event.setProp('display', 'none');
+            }
+        });
+    } else {
+        alert('Calendar is not loaded yet');
+    }
+}
+
+function exportCalendar() {
+    if (visitsData.length === 0) {
+        alert('No visits to export');
+        return;
     }
     
-    new bootstrap.Modal(document.getElementById('visitDetailsModal')).show();
-}
-
-function updateVisitDate(event) {
-    const newDate = event.start.toISOString();
-    const visitId = event.id;
+    // Create CSV format data
+    let csvContent = 'Title,Start Date,End Date,Student,Company,Purpose,Status\n';
     
-    // Show loading state
-    showToast('Updating visit date...', 'info');
-    
-    // Send AJAX request to update visit date
-    fetch(`/tutors/visit/${visitId}/update-date/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({
-            visit_date: newDate
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast('Visit date updated successfully!', 'success');
-        } else {
-            showToast(data.message || 'Failed to update visit date', 'error');
-            calendar.refetchEvents(); // Refresh calendar
+    visitsData.forEach(visit => {
+        try {
+            const startDate = new Date(visit.start).toLocaleDateString();
+            const endDate = new Date(visit.end).toLocaleDateString();
+            
+            csvContent += `"${visit.title}","${startDate}","${endDate}","${visit.extendedProps && visit.extendedProps.student ? visit.extendedProps.student : 'N/A'}","${visit.extendedProps && visit.extendedProps.company ? visit.extendedProps.company : 'N/A'}","${visit.extendedProps && visit.extendedProps.purpose ? visit.extendedProps.purpose : 'N/A'}","${visit.extendedProps && visit.extendedProps.completed ? 'Completed' : 'Scheduled'}"\n`;
+        } catch (error) {
+            console.error('Error exporting visit:', error);
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Error updating visit date', 'error');
-        calendar.refetchEvents();
-    });
-}
-
-function markVisitCompleted(visitId) {
-    // Show loading state
-    showToast('Marking visit as completed...', 'info');
-    
-    fetch(`/tutors/visit/${visitId}/mark-completed/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast('Visit marked as completed!', 'success');
-            calendar.refetchEvents();
-            updateStats();
-            bootstrap.Modal.getInstance(document.getElementById('visitDetailsModal')).hide();
-        } else {
-            showToast(data.message || 'Failed to mark visit as completed', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Error updating visit status', 'error');
-    });
-}
-
-function updateStats() {
-    if (!calendar) return;
-    
-    const events = calendar.getEvents();
-    const completed = events.filter(event => event.extendedProps.completed).length;
-    const pending = events.filter(event => !event.extendedProps.completed).length;
-    
-    document.getElementById('completed-count').textContent = completed;
-    document.getElementById('pending-count').textContent = pending;
-}
-
-function setupEventListeners() {
-    // Today button
-    document.getElementById('today-btn').addEventListener('click', () => {
-        calendar.today();
     });
     
-    // Form submission
-    document.getElementById('visitForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Disable submit button to prevent double submission
-        const submitBtn = document.getElementById('submitBtn');
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tutor_visits_calendar.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Form validation
+document.getElementById('placement_request')?.addEventListener('change', function() {
+    const submitBtn = this.form.querySelector('button[type="submit"]');
+    if (this.value && document.getElementById('visit_date').value && document.getElementById('purpose').value) {
+        submitBtn.disabled = false;
+    } else {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Scheduling...';
-        
-        const formData = new FormData(this);
-        
-        fetch(this.action, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast('Visit scheduled successfully!', 'success');
-                calendar.refetchEvents();
-                updateStats();
-                bootstrap.Modal.getInstance(document.getElementById('addVisitModal')).hide();
-                this.reset();
-            } else {
-                showToast(data.message || 'Failed to schedule visit', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error scheduling visit', 'error');
-        })
-        .finally(() => {
-            // Re-enable submit button
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-save me-2"></i>Schedule Visit';
-        });
-    });
-    
-    // Modal events
-    document.getElementById('addVisitModal').addEventListener('hidden.bs.modal', function() {
-        document.getElementById('visitForm').reset();
-    });
-}
+    }
+});
 
-function formatDateTime(date) {
-    return new Intl.DateTimeFormat('en-GB', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(date);
-}
+document.getElementById('visit_date')?.addEventListener('change', function() {
+    const submitBtn = this.form.querySelector('button[type="submit"]');
+    if (document.getElementById('placement_request').value && this.value && document.getElementById('purpose').value) {
+        submitBtn.disabled = false;
+    } else {
+        submitBtn.disabled = true;
+    }
+});
 
-function showToast(message, type = 'info') {
-    // Remove existing toasts
-    const existingToasts = document.querySelectorAll('.toast');
-    existingToasts.forEach(toast => toast.remove());
-    
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.className = `toast align-items-center text-white bg-${getToastColor(type)} border-0`;
-    toast.setAttribute('role', 'alert');
-    toast.innerHTML = `
-        <div class="d-flex">
-            <div class="toast-body">${message}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    `;
-    
-    // Add to page and show
-    document.querySelector('.toast-container').appendChild(toast);
-    const bsToast = new bootstrap.Toast(toast, { delay: 4000 });
-    bsToast.show();
-    
-    // Remove after hidden
-    toast.addEventListener('hidden.bs.toast', () => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-        }
-    });
-}
+document.getElementById('purpose')?.addEventListener('input', function() {
+    const submitBtn = this.form.querySelector('button[type="submit"]');
+    if (document.getElementById('placement_request').value && document.getElementById('visit_date').value && this.value) {
+        submitBtn.disabled = false;
+    } else {
+        submitBtn.disabled = true;
+    }
+});
 
-function getToastColor(type) {
-    const colors = {
-        'success': 'success',
-        'error': 'danger',
-        'warning': 'warning',
-        'info': 'info'
-    };
-    return colors[type] || 'info';
-}
+// Mark visit as completed
+document.getElementById('markCompleted')?.addEventListener('click', function() {
+    // This would integrate with the backend to mark visits as completed
+    alert('This feature would mark the visit as completed in the system');
+});
 </script>
-{% endblock %} 
+{% endblock %}

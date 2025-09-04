@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2 class="text-gradient mb-1">
+                    <h2 class="mb-1">
                         <i class="fas fa-tachometer-alt me-2"></i>Student Dashboard
                     </h2>
                     <p class="text-muted mb-0">Welcome back, {{ student_profile.user.get_full_name }}!</p>
@@ -19,6 +19,9 @@
                 </a>
                 <a href="{% url 'students:opportunity_list' %}" class="btn btn-success ms-2">
                     <i class="fas fa-briefcase me-2"></i>View Opportunities
+                </a>
+                <a href="{% url 'students:calendar' %}" class="btn btn-info ms-2">
+                    <i class="fas fa-calendar-alt me-2"></i>My Calendar
                 </a>
             </div>
             
@@ -61,6 +64,8 @@
                     </div>
                 </div>
             </div>
+            
+
             
             <!-- Recent Placement Requests -->
             <div class="card shadow-custom">

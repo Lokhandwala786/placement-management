@@ -16,7 +16,6 @@ urlpatterns = [
 
     # API endpoints
     path('api/v1/', include('placements.api_urls')),
-    path('api/v1/', include('accounts.api_urls')),
     path('api-auth/', include('rest_framework.urls')), # For browsable API login/logout
 ]
 
