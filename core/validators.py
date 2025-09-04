@@ -46,3 +46,36 @@ def validate_file_extension(value):
     ext = value.name.lower().split('.')[-1]
     if f'.{ext}' not in allowed_extensions:
         raise ValidationError('Only PDF, DOC, and DOCX files are allowed.')
+
+def validate_strong_password(value):
+    """Validate strong password with multiple criteria"""
+    if len(value) < 8:
+        raise ValidationError('Password must be at least 8 characters long.')
+    
+    if not re.search(r'[A-Z]', value):
+        raise ValidationError('Password must contain at least one uppercase letter.')
+    
+    if not re.search(r'[a-z]', value):
+        raise ValidationError('Password must contain at least one lowercase letter.')
+    
+    if not re.search(r'\d', value):
+        raise ValidationError('Password must contain at least one number.')
+    
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
+        raise ValidationError('Password must contain at least one special character (!@#$%^&*(),.?":{}|<>).')
+    
+    # Check for common weak passwords
+    common_passwords = [
+        'password', '123456', '123456789', 'qwerty', 'abc123', 
+        'password123', 'admin', 'letmein', 'welcome', 'monkey',
+        'dragon', 'master', 'hello', 'freedom', 'whatever'
+    ]
+    
+    if value.lower() in common_passwords:
+        raise ValidationError('This password is too common. Please choose a stronger password.')
+    
+    # Check for repeated characters
+    if re.search(r'(.)\1{2,}', value):
+        raise ValidationError('Password cannot contain more than 2 consecutive identical characters.')
+    
+    return value

@@ -45,15 +45,15 @@ function runTests() {
     // Test 1: Check if Google Maps API is loaded
     try {
         if (typeof google !== 'undefined' && google.maps) {
-            testResults.push('✅ Google Maps API loaded successfully');
-            html += '<li class="text-success">✅ Google Maps API loaded successfully</li>';
+            testResults.push('Google Maps API loaded successfully');
+            html += '<li class="text-success">Google Maps API loaded successfully</li>';
         } else {
-            testResults.push('❌ Google Maps API failed to load');
-            html += '<li class="text-danger">❌ Google Maps API failed to load</li>';
+            testResults.push('Google Maps API failed to load');
+            html += '<li class="text-danger">Google Maps API failed to load</li>';
         }
     } catch (error) {
-        testResults.push('❌ Error checking Google Maps API: ' + error.message);
-        html += '<li class="text-danger">❌ Error checking Google Maps API: ' + error.message + '</li>';
+        testResults.push('Error checking Google Maps API: ' + error.message);
+        html += '<li class="text-danger">Error checking Google Maps API: ' + error.message + '</li>';
     }
     
     // Test 2: Check if map can be created
@@ -63,11 +63,11 @@ function runTests() {
             center: { lat: 51.5074, lng: -0.1278 },
             mapTypeId: google.maps.MapTypeId.ROADMAP
         });
-        testResults.push('✅ Map created successfully');
-        html += '<li class="text-success">✅ Map created successfully</li>';
+        testResults.push('Map created successfully');
+        html += '<li class="text-success">Map created successfully</li>';
     } catch (error) {
-        testResults.push('❌ Error creating map: ' + error.message);
-        html += '<li class="text-danger">❌ Error creating map: ' + error.message + '</li>';
+        testResults.push('Error creating map: ' + error.message);
+        html += '<li class="text-danger">Error creating map: ' + error.message + '</li>';
     }
     
     // Test 3: Check if markers can be added
@@ -77,11 +77,11 @@ function runTests() {
             map: map,
             title: 'Test Marker'
         });
-        testResults.push('✅ Marker added successfully');
-        html += '<li class="text-success">✅ Marker added successfully</li>';
+        testResults.push('Marker added successfully');
+        html += '<li class="text-success">Marker added successfully</li>';
     } catch (error) {
-        testResults.push('❌ Error adding marker: ' + error.message);
-        html += '<li class="text-danger">❌ Error adding marker: ' + error.message + '</li>';
+        testResults.push('Error adding marker: ' + error.message);
+        html += '<li class="text-danger">Error adding marker: ' + error.message + '</li>';
     }
     
     // Test 4: Check if info windows work
@@ -92,17 +92,17 @@ function runTests() {
         marker.addListener('click', () => {
             infoWindow.open(map, marker);
         });
-        testResults.push('✅ Info window created and attached');
-        html += '<li class="text-success">✅ Info window created and attached</li>';
+        testResults.push('Info window created and attached');
+        html += '<li class="text-success">Info window created and attached</li>';
     } catch (error) {
-        testResults.push('❌ Error creating info window: ' + error.message);
-        html += '<li class="text-danger">❌ Error creating info window: ' + error.message + '</li>';
+        testResults.push('Error creating info window: ' + error.message);
+        html += '<li class="text-danger">Error creating info window: ' + error.message + '</li>';
     }
     
     html += '</ul>';
     
     // Summary
-    const successCount = testResults.filter(r => r.startsWith('✅')).length;
+    const successCount = testResults.filter(r => r.includes('successfully')).length;
     const totalCount = testResults.length;
     html += `<div class="alert alert-${successCount === totalCount ? 'success' : 'warning'} mt-3">
         <strong>Summary:</strong> ${successCount}/${totalCount} tests passed

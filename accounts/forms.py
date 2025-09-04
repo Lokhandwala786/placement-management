@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.exceptions import ValidationError
 from .models import User, StudentProfile, TutorProfile, ProviderProfile, Course, Department
+from core.validators import validate_strong_password
 import logging
 
 logger = logging.getLogger(__name__)
@@ -84,12 +85,16 @@ class BaseRegistrationForm(UserCreationForm):
         })
         self.fields['password1'].widget.attrs.update({
             'class': 'form-control',
-            'placeholder': 'Password (min 8 characters)'
+            'placeholder': 'Strong password (8+ chars, upper, lower, number, special)',
+            'minlength': '8'
         })
         self.fields['password2'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Confirm password'
         })
+        
+        # Add strong password validation
+        self.fields['password1'].validators.append(validate_strong_password)
 
     def clean_email(self):
         """Validate email uniqueness"""
@@ -104,6 +109,29 @@ class BaseRegistrationForm(UserCreationForm):
         if phone and User.objects.filter(phone=phone).exists():
             raise ValidationError("A user with this phone number already exists.")
         return phone
+    
+    def clean_password1(self):
+        """Validate strong password"""
+        password1 = self.cleaned_data.get('password1')
+        if password1:
+            validate_strong_password(password1)
+        return password1
+    
+    def clean(self):
+        """Validate password confirmation and overall form"""
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        
+        if password1 and password2:
+            if password1 != password2:
+                raise ValidationError("Passwords don't match.")
+            
+            # Additional password strength check
+            if len(password1) < 8:
+                raise ValidationError("Password must be at least 8 characters long.")
+        
+        return cleaned_data
 
 class StudentRegistrationForm(BaseRegistrationForm):
     """Enhanced student registration form"""
@@ -263,7 +291,7 @@ class ProviderRegistrationForm(BaseRegistrationForm):
         self.fields['last_name'].widget.attrs['placeholder'] = 'Last Name'
         self.fields['email'].widget.attrs['placeholder'] = 'Gmail Address'
         self.fields['username'].widget.attrs['placeholder'] = 'Choose a username'
-        self.fields['password1'].widget.attrs['placeholder'] = 'Password (min 8 characters)'
+        self.fields['password1'].widget.attrs['placeholder'] = 'Strong password (8+ chars, upper, lower, number, special)'
         self.fields['password2'].widget.attrs['placeholder'] = 'Confirm password'
 
     def save(self, commit=True):

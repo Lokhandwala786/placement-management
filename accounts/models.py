@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.exceptions import ValidationError
-from core.validators import validate_phone_number, validate_student_id, validate_employee_id
+from core.validators import validate_phone_number, validate_student_id, validate_employee_id, validate_strong_password
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,6 +53,13 @@ class User(AbstractUser):
         super().clean()
         if self.email and User.objects.filter(email=self.email).exclude(pk=self.pk).exists():
             raise ValidationError({'email': 'A user with this email already exists.'})
+        
+        # Validate password strength if password is being set
+        if hasattr(self, 'password') and self.password and not self.password.startswith('pbkdf2_'):
+            try:
+                validate_strong_password(self.password)
+            except ValidationError as e:
+                raise ValidationError({'password': e.message})
 
     def save(self, *args, **kwargs):
         """Override save method with logging"""
